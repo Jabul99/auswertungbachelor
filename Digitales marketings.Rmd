@@ -1,4 +1,28 @@
+---
+title: "Kanäle und Medien des digitalen Marketings"
+author: "Thomas Schmid, Damian Krebs"
+date: "12 6 2020"
+output: pdf_document
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load-packages, include=FALSE}
+library(dplyr)
 library(tidyverse)
+library(magrittr)
+library(knitr)
+library(dplyr)
+```
+
+
+```{r echo=FALSE, include = FALSE}
+library(tidyverse)
+
 dat <- read.csv2('D:\\Desktop\\BIT\\Bachelor\\06_Auswertung\\Angepasste Tabelle.csv')
 q1_Suchmaschine <-  subset(dat, select=c("Nummer", "X01_1", "X01_2", "X01_3", "X01_4", "X01_5", "X01_6", "X01b"))
 q1_Suchmaschine <-  q1_Suchmaschine %>% rename(google = X01_1, bing = X01_2, yahoo = X01_3, search.ch = X01_4 , escosia.org = X01_5, Andere =X01_6, TextAndere = X01b)
@@ -56,7 +80,6 @@ q1_SuchmaschineAngepasst$Frequenz <- as.factor(q1_SuchmaschineAngepasst$Frequenz
 q1_SuchmaschineAngepasst$Suchmaschine <- factor(q1_SuchmaschineAngepasst$Suchmaschine, levels = c("google", "bing", "yahoo","search.ch","escosia.org", "Andere"))
 q1_SuchmaschineAngepasst$Frequenz <- factor(q1_SuchmaschineAngepasst$Frequenz, levels = c("nie", "selten", "monatlich","wöchentlich","nahezu täglich"))
 
-
 q2_3_4_5_bezahlteLinks <- subset(dat, select=c("Nummer", "X2","X3","X4","X5"))
 q2_3_4_5_bezahlteLinks <- q2_3_4_5_bezahlteLinks %>% rename(ZweiteSeite = X2, ProzentBezahlteLinks = X3, ProzentKaufBezahlteLinks = X4, ZweckKauf = X5)
 
@@ -64,22 +87,22 @@ q6_VewendungSozialMedia <- subset(dat, select=c("Nummer", "X06_1", "X06_2", "X06
 q6_VewendungSozialMedia <-  q6_VewendungSozialMedia %>% rename(Facebook = X06_1, Instagram = X06_2, YouTube = X06_3, Twitter = X06_4 , LinkedIn = X06_5, Spnapchat =X06_6, TikTok =X06_7, Andere =X06_8, AndereText = X06b)
 
 q7_SucheProduktSozialMedia <- subset(dat, select=c("Nummer", "X07_1", "X07_2"))
-q7_SucheProduktSozialMedia <- q7_SucheProduktSozialMedia %>% rename(privat = X07_1, geschaeftlich = X07_2)
+q7_SucheProduktSozialMedia <- q7_SucheProduktSozialMedia %>% rename(privat = X07_1, geschäftlich = X07_2)
 
 q8_KommunikationUnternehmen <- subset(dat, select=c("Nummer", "X08_1", "X08_2"))
-q8_KommunikationUnternehmen <- q8_KommunikationUnternehmen %>% rename(privat = X08_1, geschaeftlich = X08_2)
+q8_KommunikationUnternehmen <- q8_KommunikationUnternehmen %>% rename(privat = X08_1, geschäftlich = X08_2)
 
 q9_KommunikationUnternehmenhaufig <- subset(dat, select=c("Nummer", "X09_1", "X09_2"))
-q9_KommunikationUnternehmenhaufig <- q9_KommunikationUnternehmenhaufig %>% rename(privat = X09_1, geschaeftlich = X09_2)
+q9_KommunikationUnternehmenhaufig <- q9_KommunikationUnternehmenhaufig %>% rename(privat = X09_1, geschäftlich = X09_2)
 
 q10_Unternehmeneinkauf <- subset(dat, select=c("Nummer", "X10_1", "X10_2"))
-q10_Unternehmeneinkauf <- q10_Unternehmeneinkauf %>% rename(privat = X10_1, geschaeftlich = X10_2)
+q10_Unternehmeneinkauf <- q10_Unternehmeneinkauf %>% rename(privat = X10_1, geschäftlich = X10_2)
 
 q11_UnternehmeneinkaufKonkurrenz <- subset(dat, select=c("Nummer", "X11_1", "X11_2"))
-q11_UnternehmeneinkaufKonkurrenz <- q11_UnternehmeneinkaufKonkurrenz %>% rename(privat = X11_1, geschaeftlich = X11_2)
+q11_UnternehmeneinkaufKonkurrenz <- q11_UnternehmeneinkaufKonkurrenz %>% rename(privat = X11_1, geschäftlich = X11_2)
 
 q12_likseinkauf <- subset(dat, select=c("Nummer", "X12_1", "X12_2"))
-q12_likseinkauf <- q12_likseinkauf %>% rename(privat = X12_1, geschaeftlich = X12_2)
+q12_likseinkauf <- q12_likseinkauf %>% rename(privat = X12_1, geschäftlich = X12_2)
 
 q13_SucheProduktprivate <- subset(dat, select=c("Nummer", "X13.1_1", "X13.1_2", "X13.1_3", "X13.1_4", "X13.1_5", "X13.1_6"))
 q13_SucheProduktprivate <- q13_SucheProduktprivate %>% rename(Vergleichsdienste = X13.1_1, Blogs = X13.1_2, Influencer = X13.1_3, Freunde = X13.1_4, Mitarbeiter = X13.1_5, SocialMedia = X13.1_6 )
@@ -99,7 +122,7 @@ q15_EmailNewsletter <- q15_EmailNewsletter  %>% rename(IntressePrivat = X15_1_1,
                                                        UnternehmenPrivat = X15_6_1, UnternehmenFirma = X15_6_2)
 
 q16_NichtAbonniert <- subset(dat, select=c("Nummer", "X16_1", "X16_2"))
-q16_NichtAbonniert <- q16_NichtAbonniert %>% rename(privat = X16_1, geschaeftlich = X16_2)
+q16_NichtAbonniert <- q16_NichtAbonniert %>% rename(privat = X16_1, geschäftlich = X16_2)
 
 q17_BevorzugteKommunikation <- subset(dat, select=c("Nummer", "X17_1", "X17_2", "X17_3", "X17_4","X17_5", "X17_6","X17_7", "X17_8","X17_9", "X17_10","X17_10_TEXT"))
 q17_BevorzugteKommunikation <- q17_BevorzugteKommunikation  %>% rename(Email = X17_1, Brief = X17_2,
@@ -144,7 +167,7 @@ q23_Geschlecht <- q23_Geschlecht %>% mutate(GeschlechtText = case_when(Geschlech
 q24_Alter <- subset(dat, select=c("Nummer", "X24"))
 q24_Alter <- q24_Alter %>% rename(Alter = X24)
 
-levels = c("unter 18 Jahre", "18-25", "26-32","33-40","41-55","56-65","über 65 Jahre", "Keine Angabe")
+levels = c("unter 18 Jahre", "18-25", "26-32","33-40","41-55","56-65","über 65 Jahre", "Leer")
 q24_Alter <- q24_Alter %>% mutate(AlterText = case_when(
   Alter == 1 ~ levels[1], 
   Alter == 2 ~ levels[2], 
@@ -155,10 +178,11 @@ q24_Alter <- q24_Alter %>% mutate(AlterText = case_when(
   Alter == 7 ~ levels[7],
   TRUE ~  levels[8]) %>% factor(levels))
 
-
 q1_SuchmaschineJoined <- left_join(q1_SuchmaschineAngepasst,q23_Geschlecht, by = "Nummer")
 q1_SuchmaschineJoined <- left_join(q1_SuchmaschineJoined, q24_Alter, by = "Nummer")
+
 q24_AlterJoined <- left_join(q24_Alter,q23_Geschlecht, by = "Nummer")
+
 getmode <- function(v) {
   uniqv <- unique(v)
   uniqv[which.max(tabulate(match(v, uniqv)))]
@@ -198,11 +222,122 @@ getfrequenz <- function(x, NumberOfItems, RowNamesLevels, ColumnNames){
   
   return(resultDataframe)
 }
+  
 
 
-getfrequenz(subset(q1_Suchmaschine, select = c(google, bing, yahoo, search.ch, escosia.org, Andere)),5,levels(q1_SuchmaschineJoined$Suchmaschine), c(
+```
+
+## Geschlecht Teilnehmende
+
+```{r geschlecht, echo=FALSE}
+q23_Geschlecht %>% ggplot(aes(x= GeschlechtText, fill = GeschlechtText)) + labs(x = "Geschlecht", fill = "Geschlecht", y="Anzahl")  + geom_bar() + geom_text(aes(label =stat(count)), stat= 'count', position = position_stack(vjust = .5),color="white") + scale_fill_manual(values=c("#0703f0", "#c74dc2", "#85796f"))
+
+q23 <- data.frame(Bezeichnung =c(
+                                  "Männlich",
+                                  "Weiblich",
+                                  "Standardabweichung", 
+                                  "Mittelwert",
+                                  "Median",
+                                  "Modus"),
+                  Wert = c(
+                    "1",
+                    "2",
+                    round(sd(q23_Geschlecht$Geschlecht, na.rm = TRUE),digits=6), 
+                    round(mean(q23_Geschlecht$Geschlecht, na.rm = TRUE),digits=6),
+                    round(median(q24_Alter$Alter, na.rm = TRUE),digits=6),
+                    getmode(q24_Alter$Alter)))
+
+knitr::kable(
+  q23, longtable = TRUE, booktabs = TRUE,
+  caption = "Werte Geschlecht"
+)
+
+```
+
+
+## Alter Teilnehmende
+
+```{r alter, echo=FALSE}
+q24_Alter %>% ggplot(aes(x= AlterText, fill = AlterText)) + labs(x = "Alter", fill = "Alter", y="Anzahl")  + geom_bar() + geom_text(aes(label =stat(count)), stat= 'count', position = position_stack(vjust = .5))
+
+q24_AlterJoined %>% ggplot(aes(x=AlterText, fill =GeschlechtText))+ labs(x = "Alter", y="Anzahl")  + geom_bar() + geom_text(aes(label =stat(count)), stat= 'count', position = position_stack(vjust = .5), color ="white")+ scale_fill_manual(values=c("#0703f0", "#c74dc2", "#85796f"))
+
+q24 <- data.frame(Bezeichnung =c(
+                                  "unter 18 Jahre",
+                                  "18-25",
+                                  "26-32", 
+                                  "33-40",
+                                  "41-55",
+                                  "56-65",
+                                  "über 65 Jahre",
+                                  "Standardabweichung", 
+                                  "Mittelwert",
+                                  "Median",
+                                  "Modus"),
+                  Wert = c(
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7",
+                    round(sd(q24_Alter$Alter, na.rm = TRUE),digits=6), 
+                    round(mean(q24_Alter$Alter, na.rm = TRUE),digits=6),
+                    round(median(q24_Alter$Alter, na.rm = TRUE),digits=6),
+                    getmode(q24_Alter$Alter)))
+
+knitr::kable(
+  q24, longtable = TRUE, booktabs = TRUE,
+  caption = "Werte Alter"
+)
+
+```
+
+
+## Suchmaschienenpreferenzen
+
+```{r Suchmaschine, echo=FALSE}
+
+q1_SuchmaschineAngepasst %>% ggplot(aes(x=Frequenz, fill= Suchmaschine)) + geom_bar(position = "dodge2") + xlab("Frequenz") + ylab("Anzahl") + coord_flip()
+
+q1_SuchmaschineJoined %>% ggplot(aes(x=Frequenz, fill= Suchmaschine)) + geom_bar(position = "dodge2") + xlab("Frequenz") + ylab("Anzahl") + facet_wrap(.~AlterText)  + coord_flip()
+
+q1_SuchmaschineJoined %>% ggplot(aes(x=Frequenz, fill= Suchmaschine)) + geom_bar(position = "dodge2") + xlab("Frequenz") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+
+q1 <- data.frame(Bezeichnung =c(
+                                  "nie",
+                                  "selten",
+                                  "monatlich", 
+                                  "wöchentlich",
+                                  "nahezu täglich"),
+                  Wert = c(
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5"))
+
+knitr::kable(
+  q1, longtable = TRUE, booktabs = TRUE,
+  caption = "Werte Freqeunz"
+)
+
+q1_1 <- getfrequenz(subset(q1_Suchmaschine, select = c(google, bing, yahoo, search.ch, escosia.org, Andere)),5,levels(q1_SuchmaschineJoined$Suchmaschine), c(
   "nie",
   "selten",
   "monatlich", 
   "wöchentlich",
   "nahezu täglich"))
+
+knitr::kable(
+  q1_1, longtable = TRUE, booktabs = TRUE,
+  caption = "Werte Freqeunz"
+)
+
+
+
+
+```
+
