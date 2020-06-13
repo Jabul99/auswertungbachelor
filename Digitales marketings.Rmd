@@ -23,86 +23,18 @@ library(dplyr)
 ```{r echo=FALSE, include = FALSE}
 library(tidyverse)
 
+colorSingleBar <- "steelblue"
+colorMan <-"#0703f0"
+colorWoman <- #c74dc2"
+colorGenderNot <- #85796f
+colorsGender <- c("#0703f0","#c74dc2", "#85796f")  
+
 dat <- read.csv2('D:\\Desktop\\BIT\\Bachelor\\06_Auswertung\\Angepasste Tabelle.csv')
-q1_Suchmaschine <-  subset(dat, select=c("Nummer", "X01_1", "X01_2", "X01_3", "X01_4", "X01_5", "X01_6", "X01b"))
-q1_Suchmaschine <-  q1_Suchmaschine %>% rename(google = X01_1, bing = X01_2, yahoo = X01_3, search.ch = X01_4 , escosia.org = X01_5, Andere =X01_6, TextAndere = X01b)
 
-levels = c("nie", "selten", "monatlich","wöchentlich","nahezu täglich")
-q1_SuchmaschineAngepasst <- q1_Suchmaschine %>% subset(select =c(Nummer, google, bing, yahoo, search.ch, escosia.org, Andere)) %>% 
-  mutate(
-  google = case_when(
-    google == 1 ~ levels[1], 
-    google == 2 ~ levels[2], 
-    google == 3 ~ levels[3],
-    google == 4 ~ levels[4],
-    google == 5 ~ levels[5],
-    TRUE ~  levels[1]) %>% factor(levels),
-  bing = case_when(
-    bing == 1 ~ levels[1], 
-    bing == 2 ~ levels[2], 
-    bing == 3 ~ levels[3],
-    bing == 4 ~ levels[4],
-    bing == 5 ~ levels[5],
-    TRUE ~  levels[1]) %>% factor(levels),
-  yahoo = case_when(
-    yahoo == 1 ~ levels[1], 
-    yahoo == 2 ~ levels[2], 
-    yahoo == 3 ~ levels[3],
-    yahoo == 4 ~ levels[4],
-    yahoo == 5 ~ levels[5],
-    TRUE ~  levels[1]) %>% factor(levels),
-  search.ch = case_when(
-    search.ch == 1 ~ levels[1], 
-    search.ch == 2 ~ levels[2], 
-    search.ch == 3 ~ levels[3],
-    search.ch == 4 ~ levels[4],
-    search.ch == 5 ~ levels[5],
-    TRUE ~  levels[1]) %>% factor(levels),
-  escosia.org = case_when(
-    escosia.org == 1 ~ levels[1], 
-    escosia.org == 2 ~ levels[2], 
-    escosia.org == 3 ~ levels[3],
-    escosia.org == 4 ~ levels[4],
-    escosia.org == 5 ~ levels[5],
-    TRUE ~  levels[1]) %>% factor(levels),
-  Andere = case_when(
-    Andere == 1 ~ levels[1], 
-    Andere == 2 ~ levels[2], 
-    Andere == 3 ~ levels[3],
-    Andere == 4 ~ levels[4],
-    Andere == 5 ~ levels[5],
-    TRUE ~  levels[1]) %>% factor(levels))
 
-q1_SuchmaschineAngepasst <- q1_SuchmaschineAngepasst %>% gather(google, bing, yahoo, search.ch, escosia.org, Andere, key = Suchmaschine, value = Frequenz)
 
-q1_SuchmaschineAngepasst$Suchmaschine <- as.factor(q1_SuchmaschineAngepasst$Suchmaschine)
-q1_SuchmaschineAngepasst$Frequenz <- as.factor(q1_SuchmaschineAngepasst$Frequenz)
-q1_SuchmaschineAngepasst$Suchmaschine <- factor(q1_SuchmaschineAngepasst$Suchmaschine, levels = c("google", "bing", "yahoo","search.ch","escosia.org", "Andere"))
-q1_SuchmaschineAngepasst$Frequenz <- factor(q1_SuchmaschineAngepasst$Frequenz, levels = c("nie", "selten", "monatlich","wöchentlich","nahezu täglich"))
 
-q2_3_4_5_bezahlteLinks <- subset(dat, select=c("Nummer", "X2","X3","X4","X5"))
-q2_3_4_5_bezahlteLinks <- q2_3_4_5_bezahlteLinks %>% rename(ZweiteSeite = X2, ProzentBezahlteLinks = X3, ProzentKaufBezahlteLinks = X4, ZweckKauf = X5)
 
-q6_VewendungSozialMedia <- subset(dat, select=c("Nummer", "X06_1", "X06_2", "X06_3", "X06_4", "X06_5", "X06_6", "X06_7", "X06_8", "X06b"))
-q6_VewendungSozialMedia <-  q6_VewendungSozialMedia %>% rename(Facebook = X06_1, Instagram = X06_2, YouTube = X06_3, Twitter = X06_4 , LinkedIn = X06_5, Spnapchat =X06_6, TikTok =X06_7, Andere =X06_8, AndereText = X06b)
-
-q7_SucheProduktSozialMedia <- subset(dat, select=c("Nummer", "X07_1", "X07_2"))
-q7_SucheProduktSozialMedia <- q7_SucheProduktSozialMedia %>% rename(privat = X07_1, geschäftlich = X07_2)
-
-q8_KommunikationUnternehmen <- subset(dat, select=c("Nummer", "X08_1", "X08_2"))
-q8_KommunikationUnternehmen <- q8_KommunikationUnternehmen %>% rename(privat = X08_1, geschäftlich = X08_2)
-
-q9_KommunikationUnternehmenhaufig <- subset(dat, select=c("Nummer", "X09_1", "X09_2"))
-q9_KommunikationUnternehmenhaufig <- q9_KommunikationUnternehmenhaufig %>% rename(privat = X09_1, geschäftlich = X09_2)
-
-q10_Unternehmeneinkauf <- subset(dat, select=c("Nummer", "X10_1", "X10_2"))
-q10_Unternehmeneinkauf <- q10_Unternehmeneinkauf %>% rename(privat = X10_1, geschäftlich = X10_2)
-
-q11_UnternehmeneinkaufKonkurrenz <- subset(dat, select=c("Nummer", "X11_1", "X11_2"))
-q11_UnternehmeneinkaufKonkurrenz <- q11_UnternehmeneinkaufKonkurrenz %>% rename(privat = X11_1, geschäftlich = X11_2)
-
-q12_likseinkauf <- subset(dat, select=c("Nummer", "X12_1", "X12_2"))
-q12_likseinkauf <- q12_likseinkauf %>% rename(privat = X12_1, geschäftlich = X12_2)
 
 q13_SucheProduktprivate <- subset(dat, select=c("Nummer", "X13.1_1", "X13.1_2", "X13.1_3", "X13.1_4", "X13.1_5", "X13.1_6"))
 q13_SucheProduktprivate <- q13_SucheProduktprivate %>% rename(Vergleichsdienste = X13.1_1, Blogs = X13.1_2, Influencer = X13.1_3, Freunde = X13.1_4, Mitarbeiter = X13.1_5, SocialMedia = X13.1_6 )
@@ -178,9 +110,6 @@ q24_Alter <- q24_Alter %>% mutate(AlterText = case_when(
   Alter == 7 ~ levels[7],
   TRUE ~  levels[8]) %>% factor(levels))
 
-q1_SuchmaschineJoined <- left_join(q1_SuchmaschineAngepasst,q23_Geschlecht, by = "Nummer")
-q1_SuchmaschineJoined <- left_join(q1_SuchmaschineJoined, q24_Alter, by = "Nummer")
-
 q24_AlterJoined <- left_join(q24_Alter,q23_Geschlecht, by = "Nummer")
 
 getmode <- function(v) {
@@ -188,49 +117,119 @@ getmode <- function(v) {
   uniqv[which.max(tabulate(match(v, uniqv)))]
 }
 
-getfrequenz <- function(x, NumberOfItems, RowNamesLevels, ColumnNames){
+getfrequenz <- function(x, NumberOfItems, RowNamesLevels, ColumnNames, itemNumbers){
   numberofColumns <- ncol(x)
   numberofRows <-  nrow(x)
   items <- c(1:NumberOfItems)
   itemscolums <- c(1: numberofColumns)
   
-  
-  resultDataframe <- data.frame(Feld = RowNamesLevels)
+  resultDataframe <- data.frame(Nr = itemNumbers, Feld = RowNamesLevels)
   
   for(itemNumber in items){
     columnname = ColumnNames[itemNumber]
-    resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "0.00% 0")
+    resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "0.00% (0)")
   }
+  
+  resultDataframe <- resultDataframe %>% mutate(Summe = "0")
   
   for(numberofCurrentColumn in itemscolums){
     
     numbers <- transform(as.data.frame(table(x[numberofCurrentColumn])), percentage = round(Freq/nrow(x)*100, digits = 2))
     numbers$Var1 <- as.numeric(as.character(numbers$Var1))
     
+    summeItems <- 0
     for(val in items)
     {
       if(!is.na(numbers[val,1]))
       {
-        columnnumber <- as.numeric(numbers[val,1]) +1
+        columnnumber <- as.numeric(numbers[val,1]) +2
         rownumber <- numberofCurrentColumn
         
-        resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers[val,3]), "%\t",as.character(numbers[val,2]), sep ="")
+        resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers[val,3]), "%\t (",as.character(numbers[val,2]), ")", sep ="")
         
+        summeItems <- summeItems + as.numeric(numbers[val,2])
       }
+      resultDataframe[numberofCurrentColumn,NumberOfItems +3] <- summeItems
     }
   }
   
   return(resultDataframe)
 }
+
+
+getLageparameter <- function(x, RowNamesLevels, itemNumbers){
+  numberofColumns <-ncol(x)
+  itemscolums <- c(1: numberofColumns)
   
+  values <- as.vector(rep(0, numberofColumns))
+  
+  
+  resultDataframe <- data.frame(Nr = itemNumbers, Feld = RowNamesLevels, Minimum =values, Maximum=values, Modus=values, Mittelwert=values, Standardabweichung=values, Median=values)
+  
+  for(numberofCurrentColumn in itemscolums){
+    
+    resultDataframe[numberofCurrentColumn,3] <- min(x[,numberofCurrentColumn] , na.rm = TRUE)
+    resultDataframe[numberofCurrentColumn,4] <- max(x[,numberofCurrentColumn], na.rm = TRUE)
+    resultDataframe[numberofCurrentColumn,5] <- getmode(x[,numberofCurrentColumn])
+    resultDataframe[numberofCurrentColumn,6] <- round(mean(x[,numberofCurrentColumn], na.rm = TRUE),digits=2)
+    resultDataframe[numberofCurrentColumn,7] <- round(sd(x[,numberofCurrentColumn], na.rm = TRUE),digits=2)
+    resultDataframe[numberofCurrentColumn,8] <- round(median(x[,numberofCurrentColumn], na.rm = TRUE),digits=2)
+  }
+  
+  return(resultDataframe)
+}
+
+getLageparameter1Dimensional <- function(x, TitelField){
+  numberofColumns <-ncol(x)
+  itemscolums <- c(1: numberofColumns)
+  
+  values <- c(0)
+  
+  
+  resultDataframe <- data.frame(Nr = c(1), Feld = TitelField, Minimum =values, Maximum=values, Modus=values, Mittelwert=values, Standardabweichung=values, Median=values)
+     resultDataframe[1,3] <- min(x[,1] , na.rm = TRUE)
+    resultDataframe[1,4] <- max(x[,1], na.rm = TRUE)
+    resultDataframe[1,5] <- getmode(x[,1])
+    resultDataframe[1,6] <- round(mean(x[,1], na.rm = TRUE),digits=2)
+    resultDataframe[1,7] <- round(sd(x[,1], na.rm = TRUE),digits=2)
+    resultDataframe[1,8] <- round(median(x[,1], na.rm = TRUE),digits=2)
+
+  return(resultDataframe)
+}
+
+getfrequenz1Dimension <- function(x, NumberOfItems, RowNamesLevels, itemNumbers){
+  items <- c(1:NumberOfItems)
+
+  resultDataframe <- data.frame(Nr = itemNumbers, Feld = RowNamesLevels)
+  resultDataframe <- resultDataframe %>% mutate(Antwortanzahl= "0.00% (0)")
+  
+  numbers <- transform(as.data.frame(table(x[1])), percentage = round(Freq/nrow(x)*100, digits = 2))
+  numbers$Var1 <- as.numeric(as.character(numbers$Var1))
+  
+  for(val in items)
+  {
+    if(!is.na(numbers[val,1]))
+    {
+      columnnumber <- 3
+      rownumber <- as.numeric(numbers[val,1])
+      
+      resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers[val,3]), "%\t (",as.character(numbers[val,2]), ")", sep ="")
+    }
+  }
+  
+  
+  return(resultDataframe)
+}
 
 
 ```
 
-## Geschlecht Teilnehmende
+# Geschlecht Teilnehmende
+
+## 23 - Wie alt sind Sie?
 
 ```{r geschlecht, echo=FALSE}
-q23_Geschlecht %>% ggplot(aes(x= GeschlechtText, fill = GeschlechtText)) + labs(x = "Geschlecht", fill = "Geschlecht", y="Anzahl")  + geom_bar() + geom_text(aes(label =stat(count)), stat= 'count', position = position_stack(vjust = .5),color="white") + scale_fill_manual(values=c("#0703f0", "#c74dc2", "#85796f"))
+q23_Geschlecht %>% ggplot(aes(x= GeschlechtText, fill = GeschlechtText)) + labs(x = "Geschlecht", fill = "Geschlecht", y="Anzahl")  + geom_bar() + geom_text(aes(label =stat(count)), stat= 'count', position = position_stack(vjust = .5),color="white") + scale_fill_manual(values=colorsGender)
 
 q23 <- data.frame(Bezeichnung =c(
                                   "Männlich",
@@ -255,12 +254,14 @@ knitr::kable(
 ```
 
 
-## Alter Teilnehmende
+# Alter Teilnehmende
+
+## 24 - Sind Sie ...?
 
 ```{r alter, echo=FALSE}
 q24_Alter %>% ggplot(aes(x= AlterText, fill = AlterText)) + labs(x = "Alter", fill = "Alter", y="Anzahl")  + geom_bar() + geom_text(aes(label =stat(count)), stat= 'count', position = position_stack(vjust = .5))
 
-q24_AlterJoined %>% ggplot(aes(x=AlterText, fill =GeschlechtText))+ labs(x = "Alter", y="Anzahl")  + geom_bar() + geom_text(aes(label =stat(count)), stat= 'count', position = position_stack(vjust = .5), color ="white")+ scale_fill_manual(values=c("#0703f0", "#c74dc2", "#85796f"))
+q24_AlterJoined %>% ggplot(aes(x=AlterText, fill =GeschlechtText))+ labs(x = "Alter", y="Anzahl")  + geom_bar() + geom_text(aes(label =stat(count)), stat= 'count', position = position_stack(vjust = .5), color ="white")+ scale_fill_manual(values=c(colorMan, colorWoman, colorGenderNot))
 
 q24 <- data.frame(Bezeichnung =c(
                                   "unter 18 Jahre",
@@ -295,49 +296,788 @@ knitr::kable(
 ```
 
 
-## Suchmaschienenpreferenzen
+# Suchmaschienenpreferenzen
+
+## 01 - Welche Suchmaschinen verwenden Sie für die Suche nach Informationen und wie oft?
 
 ```{r Suchmaschine, echo=FALSE}
 
+q1_Suchmaschine <-  subset(dat, select=c("Nummer", "X01_1", "X01_2", "X01_3", "X01_4", "X01_5", "X01_6", "X01b"))
+q1_Suchmaschine <-  q1_Suchmaschine %>% rename(google = X01_1, bing = X01_2, yahoo = X01_3, search.ch = X01_4 , escosia.org = X01_5, Andere =X01_6, TextAndere = X01b)
+
+levels = c("nie", "selten", "monatlich","wöchentlich","nahezu täglich")
+q1_SuchmaschineAngepasst <- q1_Suchmaschine %>% subset(select =c(Nummer, google, bing, yahoo, search.ch, escosia.org, Andere)) %>% 
+  mutate(
+  google = case_when(
+    google == 1 ~ levels[1], 
+    google == 2 ~ levels[2], 
+    google == 3 ~ levels[3],
+    google == 4 ~ levels[4],
+    google == 5 ~ levels[5],
+    TRUE ~  levels[1]) %>% factor(levels),
+  bing = case_when(
+    bing == 1 ~ levels[1], 
+    bing == 2 ~ levels[2], 
+    bing == 3 ~ levels[3],
+    bing == 4 ~ levels[4],
+    bing == 5 ~ levels[5],
+    TRUE ~  levels[1]) %>% factor(levels),
+  yahoo = case_when(
+    yahoo == 1 ~ levels[1], 
+    yahoo == 2 ~ levels[2], 
+    yahoo == 3 ~ levels[3],
+    yahoo == 4 ~ levels[4],
+    yahoo == 5 ~ levels[5],
+    TRUE ~  levels[1]) %>% factor(levels),
+  search.ch = case_when(
+    search.ch == 1 ~ levels[1], 
+    search.ch == 2 ~ levels[2], 
+    search.ch == 3 ~ levels[3],
+    search.ch == 4 ~ levels[4],
+    search.ch == 5 ~ levels[5],
+    TRUE ~  levels[1]) %>% factor(levels),
+  escosia.org = case_when(
+    escosia.org == 1 ~ levels[1], 
+    escosia.org == 2 ~ levels[2], 
+    escosia.org == 3 ~ levels[3],
+    escosia.org == 4 ~ levels[4],
+    escosia.org == 5 ~ levels[5],
+    TRUE ~  levels[1]) %>% factor(levels),
+  Andere = case_when(
+    Andere == 1 ~ levels[1], 
+    Andere == 2 ~ levels[2], 
+    Andere == 3 ~ levels[3],
+    Andere == 4 ~ levels[4],
+    Andere == 5 ~ levels[5],
+    TRUE ~  levels[1]) %>% factor(levels))
+
+q1_SuchmaschineAngepasst <- q1_SuchmaschineAngepasst %>% gather(google, bing, yahoo, search.ch, escosia.org, Andere, key = Suchmaschine, value = Frequenz)
+
+q1_SuchmaschineAngepasst$Suchmaschine <- as.factor(q1_SuchmaschineAngepasst$Suchmaschine)
+q1_SuchmaschineAngepasst$Frequenz <- as.factor(q1_SuchmaschineAngepasst$Frequenz)
+q1_SuchmaschineAngepasst$Suchmaschine <- factor(q1_SuchmaschineAngepasst$Suchmaschine, levels = c("google", "bing", "yahoo","search.ch","escosia.org", "Andere"))
+q1_SuchmaschineAngepasst$Frequenz <- factor(q1_SuchmaschineAngepasst$Frequenz, levels = c("nie", "selten", "monatlich","wöchentlich","nahezu täglich"))
+
+
+q1_SuchmaschineJoined <- left_join(q1_SuchmaschineAngepasst,q23_Geschlecht, by = "Nummer")
+q1_SuchmaschineJoined <- left_join(q1_SuchmaschineJoined, q24_Alter, by = "Nummer")
+
 q1_SuchmaschineAngepasst %>% ggplot(aes(x=Frequenz, fill= Suchmaschine)) + geom_bar(position = "dodge2") + xlab("Frequenz") + ylab("Anzahl") + coord_flip()
+
+q1_lageparameter <- getLageparameter(subset(q1_Suchmaschine, select = c(google, bing, yahoo, search.ch, escosia.org, Andere)), levels(q1_SuchmaschineJoined$Suchmaschine), c(1:6))
+
+knitr::kable(
+  q1_lageparameter, longtable = TRUE, booktabs = TRUE
+)
+
+q1_frequenz <- getfrequenz(subset(q1_Suchmaschine, select = c(google, bing, yahoo, search.ch, escosia.org, Andere)),5,levels(q1_SuchmaschineJoined$Suchmaschine), c(
+  "nie",
+  "selten",
+  "monatlich", 
+  "wöchentlich",
+  "nahezu täglich"), c(1:6))
+
+knitr::kable(
+  q1_frequenz, longtable = TRUE, booktabs = TRUE
+)
 
 q1_SuchmaschineJoined %>% ggplot(aes(x=Frequenz, fill= Suchmaschine)) + geom_bar(position = "dodge2") + xlab("Frequenz") + ylab("Anzahl") + facet_wrap(.~AlterText)  + coord_flip()
 
 q1_SuchmaschineJoined %>% ggplot(aes(x=Frequenz, fill= Suchmaschine)) + geom_bar(position = "dodge2") + xlab("Frequenz") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
 
 
-q1 <- data.frame(Bezeichnung =c(
-                                  "nie",
-                                  "selten",
-                                  "monatlich", 
-                                  "wöchentlich",
-                                  "nahezu täglich"),
-                  Wert = c(
-                    "1",
-                    "2",
-                    "3",
-                    "4",
-                    "5"))
+```
+
+# Zeite Seite der Resultatseite
+
+## 02 - In wie vielen Prozent der Fälle schauen Sie sich bei der Suche nach Informationendie zweite Resultatseite an?
+```{r ZweiteSeite, echo=FALSE}
+
+q2_bezahlteLinks <- subset(dat, select=c("Nummer", "X2"))
+q2_bezahlteLinks <- q2_bezahlteLinks %>% rename(ZweiteSeite = X2)
+
+levels = c("0 bis 20%", "21 bis 40%", "41 bis 60%","61 bis 80%","81 bis 100%")
+
+q2_bezahlteLinksAngepasst <- q2_bezahlteLinks  %>% subset(select =c(Nummer, ZweiteSeite)) %>% 
+  mutate(
+  ZweiteSeite = case_when(
+    ZweiteSeite == 1 ~ levels[1], 
+    ZweiteSeite == 2 ~ levels[2], 
+    ZweiteSeite == 3 ~ levels[3],
+    ZweiteSeite == 4 ~ levels[4],
+    ZweiteSeite == 5 ~ levels[5],
+    TRUE ~  levels[1]) %>% factor(levels))
+
+q2_bezahlteLinksAngepasst %>% ggplot(aes(x=ZweiteSeite)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + coord_flip()
+
+q2_lageparameter <- getLageparameter1Dimensional(subset(q2_bezahlteLinks, select = c(ZweiteSeite)), "Zweite Seite")
 
 knitr::kable(
-  q1, longtable = TRUE, booktabs = TRUE,
-  caption = "Werte Freqeunz"
+  q2_lageparameter, longtable = TRUE, booktabs = TRUE
 )
 
-q1_1 <- getfrequenz(subset(q1_Suchmaschine, select = c(google, bing, yahoo, search.ch, escosia.org, Andere)),5,levels(q1_SuchmaschineJoined$Suchmaschine), c(
+q2_frequenz <- getfrequenz1Dimension(subset(q2_bezahlteLinks, select = c(ZweiteSeite)),5, levels(q2_bezahlteLinksAngepasst$ZweiteSeite), c(1:5))
+
+knitr::kable(
+  q2_frequenz, longtable = TRUE, booktabs = TRUE
+)
+
+q2_bezahlteLinksJoined <- left_join(q2_bezahlteLinksAngepasst,q23_Geschlecht, by = "Nummer")
+q2_bezahlteLinksJoined <- left_join(q2_bezahlteLinksJoined, q24_Alter, by = "Nummer")
+
+q2_bezahlteLinksJoined %>% ggplot(aes(x=ZweiteSeite)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~AlterText)  + coord_flip()
+
+q2_bezahlteLinksJoined %>% ggplot(aes(x=ZweiteSeite)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+```
+
+# Bezahlte Links
+
+## 03 - In wie vielen Prozent der Fälle verwenden Sie auf der Resultatseite der Suche die bezahlten Links?
+
+```{r BezahlteLinks, echo=FALSE}
+
+q3_bezahlteLinks <- subset(dat, select=c("Nummer", "X3"))
+q3_bezahlteLinks <- q3_bezahlteLinks %>% rename(ProzentBezahlteLinks = X3)
+
+levels = c("0 bis 20%", "21 bis 40%", "41 bis 60%","61 bis 80%","81 bis 100%")
+
+q3_bezahlteLinksAngepasst <- q3_bezahlteLinks  %>% subset(select =c(Nummer, ProzentBezahlteLinks)) %>% 
+  mutate(
+  ProzentBezahlteLinks = case_when(
+    ProzentBezahlteLinks == 1 ~ levels[1], 
+    ProzentBezahlteLinks == 2 ~ levels[2], 
+    ProzentBezahlteLinks == 3 ~ levels[3],
+    ProzentBezahlteLinks == 4 ~ levels[4],
+    ProzentBezahlteLinks == 5 ~ levels[5],
+    TRUE ~  levels[1]) %>% factor(levels))
+
+q3_bezahlteLinksAngepasst %>% ggplot(aes(x=ProzentBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + coord_flip()
+
+q3_lageparameter <- getLageparameter1Dimensional(subset(q3_bezahlteLinks, select = c(ProzentBezahlteLinks)), "Bezahlte Links")
+
+knitr::kable(
+  q3_lageparameter, longtable = TRUE, booktabs = TRUE
+)
+
+q3_frequenz <- getfrequenz1Dimension(subset(q3_bezahlteLinks, select = c(ProzentBezahlteLinks)),5, levels(q3_bezahlteLinksAngepasst$ProzentBezahlteLinks), c(1:5))
+
+knitr::kable(
+  q3_frequenz, longtable = TRUE, booktabs = TRUE
+)
+
+q3_bezahlteLinksJoined <- left_join(q3_bezahlteLinksAngepasst,q23_Geschlecht, by = "Nummer")
+q3_bezahlteLinksJoined <- left_join(q3_bezahlteLinksJoined, q24_Alter, by = "Nummer")
+
+q3_bezahlteLinksJoined %>% ggplot(aes(x=ProzentBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~AlterText)  + coord_flip()
+
+q3_bezahlteLinksJoined %>% ggplot(aes(x=ProzentBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+```
+
+# Konsum aufgrund von bezahlten Links
+
+## 04 - In wie vielen Prozent der Fälle haben Sie aufgrund von bezahlten Links Produkte oder Dienstleistungen konsumiert?
+
+```{r KonsumBezahlteLinks, echo=FALSE}
+
+
+q4_bezahlteLinks <- subset(dat, select=c("Nummer", "X4"))
+q4_bezahlteLinks <- q4_bezahlteLinks %>% rename(ProzentKaufBezahlteLinks = X4)
+
+levels = c("0 bis 20%", "21 bis 40%", "41 bis 60%","61 bis 80%","81 bis 100%")
+
+q4_bezahlteLinksAngepasst <- q4_bezahlteLinks  %>% subset(select =c(Nummer, ProzentKaufBezahlteLinks)) %>% 
+  mutate(
+  ProzentKaufBezahlteLinks = case_when(
+    ProzentKaufBezahlteLinks == 1 ~ levels[1], 
+    ProzentKaufBezahlteLinks == 2 ~ levels[2], 
+    ProzentKaufBezahlteLinks == 3 ~ levels[3],
+    ProzentKaufBezahlteLinks == 4 ~ levels[4],
+    ProzentKaufBezahlteLinks == 5 ~ levels[5],
+    TRUE ~  levels[1]) %>% factor(levels))
+
+q4_bezahlteLinksAngepasst %>% ggplot(aes(x=ProzentKaufBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + coord_flip()
+
+q4_lageparameter <- getLageparameter1Dimensional(subset(q4_bezahlteLinks, select = c(ProzentKaufBezahlteLinks)), "Konsum")
+
+knitr::kable(
+  q4_lageparameter, longtable = TRUE, booktabs = TRUE
+)
+
+q4_frequenz <- getfrequenz1Dimension(subset(q4_bezahlteLinks, select = c(ProzentKaufBezahlteLinks)),5, levels(q4_bezahlteLinksAngepasst$ProzentKaufBezahlteLinks), c(1:5))
+
+knitr::kable(
+  q4_frequenz, longtable = TRUE, booktabs = TRUE
+)
+
+q4_bezahlteLinksJoined <- left_join(q4_bezahlteLinksAngepasst,q23_Geschlecht, by = "Nummer")
+q4_bezahlteLinksJoined <- left_join(q4_bezahlteLinksJoined, q24_Alter, by = "Nummer")
+
+q4_bezahlteLinksJoined %>% ggplot(aes(x=ProzentKaufBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~AlterText)  + coord_flip()
+
+q4_bezahlteLinksJoined %>% ggplot(aes(x=ProzentKaufBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+```
+
+
+# Zweck des Kaufes
+
+## 05 - Für welchen Zweck kauften Sie über bezahlte Links etwas ein?
+
+```{r ZweckKauf, echo=FALSE}
+
+q5_bezahlteLinks <- subset(dat, select=c("Nummer","X5"))
+q5_bezahlteLinks <- q5_bezahlteLinks %>% rename(ZweckKauf = X5)
+
+levels = c("privat", "geschäftlich", "beides")
+
+q5_bezahlteLinksAngepasst <- q5_bezahlteLinks  %>% subset(select =c(Nummer, ZweckKauf)) %>% 
+  mutate(
+  ZweckKauf = case_when(
+    ZweckKauf == 1 ~ levels[1], 
+    ZweckKauf == 2 ~ levels[2], 
+    ZweckKauf == 3 ~ levels[3],
+    TRUE ~  levels[1]) %>% factor(levels))
+
+q5_bezahlteLinksAngepasst %>% ggplot(aes(x=ZweckKauf)) + geom_bar(fill=colorSingleBar) + xlab("Zweck") + ylab("Anzahl") + coord_flip()
+
+q5_lageparameter <- getLageparameter1Dimensional(subset(q5_bezahlteLinks, select = c(ZweckKauf)), "Zweck")
+
+knitr::kable(
+  q5_lageparameter, longtable = TRUE, booktabs = TRUE
+)
+
+q5_frequenz <- getfrequenz1Dimension(subset(q5_bezahlteLinks, select = c(ZweckKauf)),3, levels(q5_bezahlteLinksAngepasst$ZweckKauf), c(1:3))
+
+knitr::kable(
+  q5_frequenz, longtable = TRUE, booktabs = TRUE
+)
+
+q5_bezahlteLinksJoined <- left_join(q5_bezahlteLinksAngepasst,q23_Geschlecht, by = "Nummer")
+q5_bezahlteLinksJoined <- left_join(q5_bezahlteLinksJoined, q24_Alter, by = "Nummer")
+
+q5_bezahlteLinksJoined %>% ggplot(aes(x=ZweckKauf)) + geom_bar(fill=colorSingleBar) + xlab("Zweck") + ylab("Anzahl") + facet_wrap(.~AlterText)  + coord_flip()
+
+q5_bezahlteLinksJoined %>% ggplot(aes(x=ZweckKauf)) + geom_bar(fill=colorSingleBar) + xlab("Zweck") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+```
+
+
+# Verwendung Social Media
+
+## 06 - Welche Social Media Kanäle verwenden Sie und wie oft?
+
+```{r SocialMediaVerwendung, echo=FALSE}
+
+q6_VewendungSozialMedia <- subset(dat, select=c("Nummer", "X06_1", "X06_2", "X06_3", "X06_4", "X06_5", "X06_6", "X06_7", "X06_8", "X06b"))
+q6_VewendungSozialMedia <-  q6_VewendungSozialMedia %>% rename(Facebook = X06_1, Instagram = X06_2, YouTube = X06_3, Twitter = X06_4 , LinkedIn = X06_5, Spnapchat =X06_6, TikTok =X06_7, Andere =X06_8, AndereText = X06b)
+
+levels = c("nie", "selten", "monatlich","wöchentlich","nahezu täglich")
+q6_VewendungSozialMediaAngepasst <- q6_VewendungSozialMedia %>% subset(select =
+                                                                         
+              c(Nummer,Facebook, Instagram, YouTube, Twitter, LinkedIn, Spnapchat, TikTok, Andere)) %>% 
+  mutate(
+    Facebook = case_when(
+      Facebook == 1 ~ levels[1], 
+      Facebook == 2 ~ levels[2], 
+      Facebook == 3 ~ levels[3],
+      Facebook == 4 ~ levels[4],
+      Facebook == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    Instagram = case_when(
+      Instagram == 1 ~ levels[1], 
+      Instagram == 2 ~ levels[2], 
+      Instagram == 3 ~ levels[3],
+      Instagram == 4 ~ levels[4],
+      Instagram == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    YouTube = case_when(
+      YouTube == 1 ~ levels[1], 
+      YouTube == 2 ~ levels[2], 
+      YouTube == 3 ~ levels[3],
+      YouTube == 4 ~ levels[4],
+      YouTube == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    Twitter = case_when(
+      Twitter == 1 ~ levels[1], 
+      Twitter == 2 ~ levels[2], 
+      Twitter == 3 ~ levels[3],
+      Twitter == 4 ~ levels[4],
+      Twitter == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    LinkedIn = case_when(
+      LinkedIn == 1 ~ levels[1], 
+      LinkedIn == 2 ~ levels[2], 
+      LinkedIn == 3 ~ levels[3],
+      LinkedIn == 4 ~ levels[4],
+      LinkedIn == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    Spnapchat = case_when(
+      Spnapchat == 1 ~ levels[1], 
+      Spnapchat == 2 ~ levels[2], 
+      Spnapchat == 3 ~ levels[3],
+      Spnapchat == 4 ~ levels[4],
+      Spnapchat == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    TikTok = case_when(
+      TikTok == 1 ~ levels[1], 
+      TikTok == 2 ~ levels[2], 
+      TikTok == 3 ~ levels[3],
+      TikTok == 4 ~ levels[4],
+      TikTok == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    Andere = case_when(
+      Andere == 1 ~ levels[1], 
+      Andere == 2 ~ levels[2], 
+      Andere == 3 ~ levels[3],
+      Andere == 4 ~ levels[4],
+      Andere == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels))
+
+q6_VewendungSozialMediaAngepasst <- q6_VewendungSozialMediaAngepasst %>% gather(Facebook, Instagram, YouTube, Twitter, LinkedIn, Spnapchat, TikTok, Andere, key = SocialMedia, value = Frequenz)
+
+q6_VewendungSozialMediaAngepasst$SocialMedia <- as.factor(q6_VewendungSozialMediaAngepasst$SocialMedia)
+q6_VewendungSozialMediaAngepasst$Frequenz <- as.factor(q6_VewendungSozialMediaAngepasst$Frequenz)
+q6_VewendungSozialMediaAngepasst$SocialMedia <- factor(q6_VewendungSozialMediaAngepasst$SocialMedia, levels = c("Facebook", "Instagram", "YouTube","Twitter","LinkedIn", "Spnapchat", "TikTok", "Andere"))
+q6_VewendungSozialMediaAngepasst$Frequenz <- factor(q6_VewendungSozialMediaAngepasst$Frequenz, levels = c("nie", "selten", "monatlich","wöchentlich","nahezu täglich"))
+
+
+q6_VewendungSozialMediaJoined <- left_join(q6_VewendungSozialMediaAngepasst,q23_Geschlecht, by = "Nummer")
+q6_VewendungSozialMediaJoined <- left_join(q6_VewendungSozialMediaJoined, q24_Alter, by = "Nummer")
+
+q6_VewendungSozialMediaAngepasst %>% ggplot(aes(x=Frequenz, fill= SocialMedia)) + geom_bar(position = "dodge2") + xlab("Frequenz") + ylab("Anzahl") + coord_flip()
+
+q6_lageparameter <- getLageparameter(subset(q6_VewendungSozialMedia, select = c(Facebook, Instagram, YouTube, Twitter, LinkedIn, Spnapchat, TikTok, Andere)), levels(q6_VewendungSozialMediaAngepasst$SocialMedia), c(1:8))
+
+knitr::kable(
+  q6_lageparameter, longtable = TRUE, booktabs = TRUE
+)
+
+q6_frequenz <- getfrequenz(subset(q6_VewendungSozialMedia, select = c(Facebook, Instagram, YouTube, Twitter, LinkedIn, Spnapchat, TikTok, Andere)),5,levels(q6_VewendungSozialMediaAngepasst$SocialMedia), c(
   "nie",
   "selten",
   "monatlich", 
   "wöchentlich",
-  "nahezu täglich"))
+  "nahezu täglich"), c(1:8))
 
 knitr::kable(
-  q1_1, longtable = TRUE, booktabs = TRUE,
-  caption = "Werte Freqeunz"
+  q6_frequenz, longtable = TRUE, booktabs = TRUE
 )
 
+q6_VewendungSozialMediaJoined %>% ggplot(aes(x=Frequenz, fill= SocialMedia)) + geom_bar(position = "dodge2") + xlab("Frequenz") + ylab("Anzahl") + facet_wrap(.~AlterText)  + coord_flip()
 
+q6_VewendungSozialMediaJoined %>% ggplot(aes(x=Frequenz, fill= SocialMedia)) + geom_bar(position = "dodge2") + xlab("Frequenz") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
 
 
 ```
+
+
+# Suche von Produkten oder Dienstleistungen in Social Media
+
+## 07 - Verwenden Sie auf der Suche nach neuen Produkten oder Dienstleistungen Social Media?
+
+```{r SucheInSocailMedia, echo=FALSE}
+
+q7_SucheProduktSozialMedia <- subset(dat, select=c("Nummer", "X07_1", "X07_2"))
+q7_SucheProduktSozialMedia <- q7_SucheProduktSozialMedia %>% rename(privat = X07_1, geschäftlich = X07_2)
+
+levels = c("nie", "eher nicht", "vielleicht","ziemlich wahrscheinlich","ganz sicher")
+q7_SucheProduktSozialMediaAngepasst <- q7_SucheProduktSozialMedia %>% subset(select = c(Nummer, privat, geschäftlich)) %>% 
+  mutate(
+    privat = case_when(
+      privat == 1 ~ levels[1], 
+      privat == 2 ~ levels[2], 
+      privat == 3 ~ levels[3],
+      privat == 4 ~ levels[4],
+      privat == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    geschäftlich = case_when(
+      geschäftlich == 1 ~ levels[1], 
+      geschäftlich == 2 ~ levels[2], 
+      geschäftlich == 3 ~ levels[3],
+      geschäftlich == 4 ~ levels[4],
+      geschäftlich == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels))
+
+q7_SucheProduktSozialMediaAngepasst <- q7_SucheProduktSozialMediaAngepasst %>% gather(privat, geschäftlich, key = Art, value = Frequenz)
+
+q7_SucheProduktSozialMediaAngepasst$Art <- as.factor(q7_SucheProduktSozialMediaAngepasst$Art)
+q7_SucheProduktSozialMediaAngepasst$Frequenz <- as.factor(q7_SucheProduktSozialMediaAngepasst$Frequenz)
+q7_SucheProduktSozialMediaAngepasst$Art <- factor(q7_SucheProduktSozialMediaAngepasst$Art, levels = c("privat", "geschäftlich"))
+q7_SucheProduktSozialMediaAngepasst$Frequenz <- factor(q7_SucheProduktSozialMediaAngepasst$Frequenz, levels = levels)
+
+
+
+
+q7_SucheProduktSozialMediaJoined <- left_join(q7_SucheProduktSozialMediaAngepasst,q23_Geschlecht, by = "Nummer")
+q7_SucheProduktSozialMediaJoined <- left_join(q7_SucheProduktSozialMediaJoined, q24_Alter, by = "Nummer")
+
+q7_SucheProduktSozialMediaAngepasst %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + coord_flip()
+
+q7_lageparameter <- getLageparameter(subset(q7_SucheProduktSozialMedia, select = c(privat, geschäftlich)), levels(q7_SucheProduktSozialMediaAngepasst$Art), c(1:2))
+
+knitr::kable(
+  q7_lageparameter, longtable = TRUE, booktabs = TRUE
+)
+
+q7_frequenz <- getfrequenz(subset(q7_SucheProduktSozialMedia, select = c(privat, geschäftlich)),5,levels(q7_SucheProduktSozialMediaAngepasst$Art), c(
+  "nie",
+  "eher nicht",
+  "vielleicht", 
+  "ziemlich wahrscheinlich",
+  "ganz sicher"), c(1:2))
+
+knitr::kable(
+  q7_frequenz, longtable = TRUE, booktabs = TRUE
+)
+
+q7_SucheProduktSozialMediaJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText)  + coord_flip()
+
+q7_SucheProduktSozialMediaJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+
+```
+
+
+# Kommunikation mit Unternehmungen über Social Media
+
+## 08 - Kommunizieren Sie mit Unternehmen über Social Media Kanäle?
+
+```{r KommunikationUnterSocialMeida, echo=FALSE}
+
+q8_KommunikationUnternehmen <- subset(dat, select=c("Nummer", "X08_1", "X08_2"))
+q8_KommunikationUnternehmen <- q8_KommunikationUnternehmen %>% rename(privat = X08_1, geschäftlich = X08_2)
+
+levels = c("nie", "selten", "gelegentlich","oft","immer")
+q8_KommunikationUnternehmenAngepasst <- q8_KommunikationUnternehmen %>% subset(select = c(Nummer, privat, geschäftlich)) %>% 
+  mutate(
+    privat = case_when(
+      privat == 1 ~ levels[1], 
+      privat == 2 ~ levels[2], 
+      privat == 3 ~ levels[3],
+      privat == 4 ~ levels[4],
+      privat == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    geschäftlich = case_when(
+      geschäftlich == 1 ~ levels[1], 
+      geschäftlich == 2 ~ levels[2], 
+      geschäftlich == 3 ~ levels[3],
+      geschäftlich == 4 ~ levels[4],
+      geschäftlich == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels))
+
+q8_KommunikationUnternehmenAngepasst <- q8_KommunikationUnternehmenAngepasst %>% gather(privat, geschäftlich, key = Art, value = Frequenz)
+
+q8_KommunikationUnternehmenAngepasst$Art <- as.factor(q8_KommunikationUnternehmenAngepasst$Art)
+q8_KommunikationUnternehmenAngepasst$Frequenz <- as.factor(q8_KommunikationUnternehmenAngepasst$Frequenz)
+q8_KommunikationUnternehmenAngepasst$Art <- factor(q8_KommunikationUnternehmenAngepasst$Art, levels = c("privat", "geschäftlich"))
+q8_KommunikationUnternehmenAngepasst$Frequenz <- factor(q8_KommunikationUnternehmenAngepasst$Frequenz, levels = levels)
+
+
+
+
+
+
+q8_KommunikationUnternehmenJoined <- left_join(q8_KommunikationUnternehmenAngepasst,q23_Geschlecht, by = "Nummer")
+q8_KommunikationUnternehmenJoined <- left_join(q8_KommunikationUnternehmenJoined, q24_Alter, by = "Nummer")
+
+q8_KommunikationUnternehmenAngepasst %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + coord_flip()
+
+q8_lageparameter <- getLageparameter(subset(q8_KommunikationUnternehmen, select = c(privat, geschäftlich)), levels(q8_KommunikationUnternehmenAngepasst$Art), c(1:2))
+
+knitr::kable(
+  q8_lageparameter, longtable = TRUE, booktabs = TRUE
+)
+
+q8_frequenz <- getfrequenz(subset(q8_KommunikationUnternehmen, select = c(privat, geschäftlich)),5,levels(q8_KommunikationUnternehmenAngepasst$Art), c(
+  "nie",
+  "eher nicht",
+  "vielleicht", 
+  "ziemlich wahrscheinlich",
+  "ganz sicher"), c(1:2))
+
+knitr::kable(
+  q8_frequenz, longtable = TRUE, booktabs = TRUE
+)
+
+q8_KommunikationUnternehmenJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText)  + coord_flip()
+
+q8_KommunikationUnternehmenJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+
+```
+
+# Häufigkeit der Kommunikation über Social Media
+
+## 09 - Wie häufig kommunizieren Sie mit dem gleichen Unternehmen über einen Social Media Kanal?
+
+```{r KommunikationUnterSocialMeidaHaefigkeit, echo=FALSE}
+
+q9_KommunikationUnternehmenhaufig <- subset(dat, select=c("Nummer", "X09_1", "X09_2"))
+q9_KommunikationUnternehmenhaufig <- q9_KommunikationUnternehmenhaufig %>% rename(privat = X09_1, geschäftlich = X09_2)
+
+levels = c("nie", "selten", "gelegentlich","oft","immer")
+q9_KommunikationUnternehmenhaufigAngepasst <- q9_KommunikationUnternehmenhaufig %>% subset(select = c(Nummer,privat, geschäftlich)) %>% 
+  mutate(
+    privat = case_when(
+      privat == 1 ~ levels[1], 
+      privat == 2 ~ levels[2], 
+      privat == 3 ~ levels[3],
+      privat == 4 ~ levels[4],
+      privat == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    geschäftlich = case_when(
+      geschäftlich == 1 ~ levels[1], 
+      geschäftlich == 2 ~ levels[2], 
+      geschäftlich == 3 ~ levels[3],
+      geschäftlich == 4 ~ levels[4],
+      geschäftlich == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels))
+
+q9_KommunikationUnternehmenhaufigAngepasst <- q9_KommunikationUnternehmenhaufigAngepasst %>% gather(privat, geschäftlich, key = Art, value = Frequenz)
+
+q9_KommunikationUnternehmenhaufigAngepasst$Art <- as.factor(q9_KommunikationUnternehmenhaufigAngepasst$Art)
+q9_KommunikationUnternehmenhaufigAngepasst$Frequenz <- as.factor(q9_KommunikationUnternehmenhaufigAngepasst$Frequenz)
+q9_KommunikationUnternehmenhaufigAngepasst$Art <- factor(q9_KommunikationUnternehmenhaufigAngepasst$Art, levels = c("privat", "geschäftlich"))
+q9_KommunikationUnternehmenhaufigAngepasst$Frequenz <- factor(q9_KommunikationUnternehmenhaufigAngepasst$Frequenz, levels = levels)
+
+
+
+
+
+q9_KommunikationUnternehmenhaufigJoined <- left_join(q9_KommunikationUnternehmenhaufigAngepasst,q23_Geschlecht, by = "Nummer")
+q9_KommunikationUnternehmenhaufigJoined <- left_join(q9_KommunikationUnternehmenhaufigJoined, q24_Alter, by = "Nummer")
+
+q9_KommunikationUnternehmenhaufigAngepasst %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + coord_flip()
+
+q9_lageparameter <- getLageparameter(subset(q9_KommunikationUnternehmenhaufig, select = c(privat, geschäftlich)), levels(q9_KommunikationUnternehmenhaufigAngepasst$Art), c(1:2))
+
+knitr::kable(
+  q9_lageparameter, longtable = TRUE, booktabs = TRUE
+)
+
+q9_frequenz <- getfrequenz(subset(q9_KommunikationUnternehmenhaufig, select = c(privat, geschäftlich)),5,levels(q9_KommunikationUnternehmenhaufigAngepasst$Art), c(
+  "nie",
+  "selten",
+  "gelegentlich", 
+  "oft",
+  "immer"), c(1:2))
+
+knitr::kable(
+  q9_frequenz, longtable = TRUE, booktabs = TRUE
+)
+
+q9_KommunikationUnternehmenhaufigJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText)  + coord_flip()
+
+q9_KommunikationUnternehmenhaufigJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+
+```
+
+
+
+# Kauf über Social Media von Unternehmen mit welchen man kommuniziert
+
+## 10 - Kaufen Sie Ihre Produkte oder Dienstleistungen bei dem Unternehmen ein, mit dem Sie über Social Media kommunizieren?
+
+```{r KommunikationUnterSocialMeidaKauf, echo=FALSE}
+
+q10_Unternehmeneinkauf <- subset(dat, select=c("Nummer", "X10_1", "X10_2"))
+q10_Unternehmeneinkauf <- q10_Unternehmeneinkauf %>% rename(privat = X10_1, geschäftlich = X10_2)
+
+
+levels = c("nie", "selten", "gelegentlich","oft","immer")
+q10_UnternehmeneinkaufAngepasst <- q10_Unternehmeneinkauf %>% subset(select = c(Nummer, privat, geschäftlich)) %>% 
+  mutate(
+    privat = case_when(
+      privat == 1 ~ levels[1], 
+      privat == 2 ~ levels[2], 
+      privat == 3 ~ levels[3],
+      privat == 4 ~ levels[4],
+      privat == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    geschäftlich = case_when(
+      geschäftlich == 1 ~ levels[1], 
+      geschäftlich == 2 ~ levels[2], 
+      geschäftlich == 3 ~ levels[3],
+      geschäftlich == 4 ~ levels[4],
+      geschäftlich == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels))
+
+q10_UnternehmeneinkaufAngepasst <- q10_UnternehmeneinkaufAngepasst %>% gather(privat, geschäftlich, key = Art, value = Frequenz)
+
+q10_UnternehmeneinkaufAngepasst$Art <- as.factor(q10_UnternehmeneinkaufAngepasst$Art)
+q10_UnternehmeneinkaufAngepasst$Frequenz <- as.factor(q10_UnternehmeneinkaufAngepasst$Frequenz)
+q10_UnternehmeneinkaufAngepasst$Art <- factor(q10_UnternehmeneinkaufAngepasst$Art, levels = c("privat", "geschäftlich"))
+q10_UnternehmeneinkaufAngepasst$Frequenz <- factor(q10_UnternehmeneinkaufAngepasst$Frequenz, levels = levels)
+
+
+
+
+
+
+q10_UnternehmeneinkaufJoined <- left_join(q10_UnternehmeneinkaufAngepasst,q23_Geschlecht, by = "Nummer")
+q10_UnternehmeneinkaufJoined <- left_join(q10_UnternehmeneinkaufJoined, q24_Alter, by = "Nummer")
+
+q10_UnternehmeneinkaufAngepasst %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + coord_flip()
+
+q10_lageparameter <- getLageparameter(subset(q10_Unternehmeneinkauf, select = c(privat, geschäftlich)), levels(q10_UnternehmeneinkaufAngepasst$Art), c(1:2))
+
+knitr::kable(
+  q10_lageparameter, longtable = TRUE, booktabs = TRUE
+)
+
+q10_frequenz <- getfrequenz(subset(q10_Unternehmeneinkauf, select = c(privat, geschäftlich)),5,levels(q10_UnternehmeneinkaufAngepasst$Art), c(
+  "nie",
+  "selten",
+  "gelegentlich", 
+  "oft",
+  "immer"), c(1:2))
+
+knitr::kable(
+  q10_frequenz, longtable = TRUE, booktabs = TRUE
+)
+
+q10_UnternehmeneinkaufJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText)  + coord_flip()
+
+q10_UnternehmeneinkaufJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+
+```
+
+
+
+
+# Kauf der Angeboten bei der Konkurrenz
+
+## 11 - Kaufen Sie diese Produkte oder Dienstleistungen auch bei der Konkurrenz ein?
+
+```{r KommunikationUnterSocialMeidaKonkurrenz, echo=FALSE}
+
+q11_UnternehmeneinkaufKonkurrenz <- subset(dat, select=c("Nummer", "X11_1", "X11_2"))
+q11_UnternehmeneinkaufKonkurrenz <- q11_UnternehmeneinkaufKonkurrenz %>% rename(privat = X11_1, geschäftlich = X11_2)
+
+levels = c("keinesfalls", "eher nicht", "vielleicht","ziemlich wahrscheinlich","ganz sicher")
+q11_UnternehmeneinkaufKonkurrenzAngepasst <- q11_UnternehmeneinkaufKonkurrenz %>% subset(select = c(Nummer,privat, geschäftlich)) %>% 
+  mutate(
+    privat = case_when(
+      privat == 1 ~ levels[1], 
+      privat == 2 ~ levels[2], 
+      privat == 3 ~ levels[3],
+      privat == 4 ~ levels[4],
+      privat == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    geschäftlich = case_when(
+      geschäftlich == 1 ~ levels[1], 
+      geschäftlich == 2 ~ levels[2], 
+      geschäftlich == 3 ~ levels[3],
+      geschäftlich == 4 ~ levels[4],
+      geschäftlich == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels))
+
+q11_UnternehmeneinkaufKonkurrenzAngepasst <- q11_UnternehmeneinkaufKonkurrenzAngepasst %>% gather(privat, geschäftlich, key = Art, value = Frequenz)
+
+q11_UnternehmeneinkaufKonkurrenzAngepasst$Art <- as.factor(q11_UnternehmeneinkaufKonkurrenzAngepasst$Art)
+q11_UnternehmeneinkaufKonkurrenzAngepasst$Frequenz <- as.factor(q11_UnternehmeneinkaufKonkurrenzAngepasst$Frequenz)
+q11_UnternehmeneinkaufKonkurrenzAngepasst$Art <- factor(q11_UnternehmeneinkaufKonkurrenzAngepasst$Art, levels = c("privat", "geschäftlich"))
+q11_UnternehmeneinkaufKonkurrenzAngepasst$Frequenz <- factor(q11_UnternehmeneinkaufKonkurrenzAngepasst$Frequenz, levels = levels)
+
+q11_UnternehmeneinkaufKonkurrenzJoined <- left_join(q11_UnternehmeneinkaufKonkurrenzAngepasst,q23_Geschlecht, by = "Nummer")
+q11_UnternehmeneinkaufKonkurrenzJoined <- left_join(q11_UnternehmeneinkaufKonkurrenzJoined, q24_Alter, by = "Nummer")
+
+q11_UnternehmeneinkaufKonkurrenzAngepasst %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + coord_flip()
+
+q11_lageparameter <- getLageparameter(subset(q11_UnternehmeneinkaufKonkurrenz, select = c(privat, geschäftlich)), levels(q11_UnternehmeneinkaufKonkurrenzAngepasst$Art), c(1:2))
+
+knitr::kable(
+  q11_lageparameter, longtable = TRUE, booktabs = TRUE
+)
+
+q11_frequenz <- getfrequenz(subset(q11_UnternehmeneinkaufKonkurrenz, select = c(privat, geschäftlich)),5,levels(q11_UnternehmeneinkaufKonkurrenzAngepasst$Art), c(
+  "keinesfalls",
+  "eher nicht",
+  "vielleicht", 
+  "ziemlich wahrscheinlich",
+  "ganz sicher"), c(1:2))
+
+knitr::kable(
+  q11_frequenz, longtable = TRUE, booktabs = TRUE
+)
+
+q11_UnternehmeneinkaufKonkurrenzJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText)  + coord_flip()
+
+q11_UnternehmeneinkaufKonkurrenzJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+
+```
+
+
+
+
+# Einfluss von Liks auf den Einkauf
+
+## 12 - Wie häufig wird Ihre Kaufentscheidung durch Likes von Bekannten und Freunden beeinflusst?
+
+```{r EinkaufLiks, echo=FALSE}
+
+q12_likseinkauf <- subset(dat, select=c("Nummer", "X12_1", "X12_2"))
+q12_likseinkauf <- q12_likseinkauf %>% rename(privat = X12_1, geschäftlich = X12_2)
+
+levels = c("nie", "selten", "gelegentlich","oft","immer")
+q12_likseinkaufAngepasst <- q12_likseinkauf %>% subset(select = c(Nummer, privat, geschäftlich)) %>% 
+  mutate(
+    privat = case_when(
+      privat == 1 ~ levels[1], 
+      privat == 2 ~ levels[2], 
+      privat == 3 ~ levels[3],
+      privat == 4 ~ levels[4],
+      privat == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    geschäftlich = case_when(
+      geschäftlich == 1 ~ levels[1], 
+      geschäftlich == 2 ~ levels[2], 
+      geschäftlich == 3 ~ levels[3],
+      geschäftlich == 4 ~ levels[4],
+      geschäftlich == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels))
+
+q12_likseinkaufAngepasst <- q12_likseinkaufAngepasst %>% gather(privat, geschäftlich, key = Art, value = Frequenz)
+
+q12_likseinkaufAngepasst$Art <- as.factor(q12_likseinkaufAngepasst$Art)
+q12_likseinkaufAngepasst$Frequenz <- as.factor(q12_likseinkaufAngepasst$Frequenz)
+q12_likseinkaufAngepasst$Art <- factor(q12_likseinkaufAngepasst$Art, levels = c("privat", "geschäftlich"))
+q12_likseinkaufAngepasst$Frequenz <- factor(q12_likseinkaufAngepasst$Frequenz, levels = levels)
+
+
+q12_likseinkaufJoined <- left_join(q12_likseinkaufAngepasst,q23_Geschlecht, by = "Nummer")
+q12_likseinkaufJoined <- left_join(q12_likseinkaufJoined, q24_Alter, by = "Nummer")
+
+q12_likseinkaufAngepasst %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + coord_flip()
+
+q12_lageparameter <- getLageparameter(subset(q12_likseinkauf, select = c(privat, geschäftlich)), levels(q12_likseinkaufAngepasst$Art), c(1:2))
+
+knitr::kable(
+  q12_lageparameter, longtable = TRUE, booktabs = TRUE
+)
+
+q12_frequenz <- getfrequenz(subset(q12_likseinkauf, select = c(privat, geschäftlich)),5,levels(q12_likseinkaufAngepasst$Art), c(
+  "nie",
+  "selten",
+  "gelegentlich", 
+  "oft",
+  "immer"), c(1:2))
+
+knitr::kable(
+  q12_frequenz, longtable = TRUE, booktabs = TRUE
+)
+
+q12_likseinkaufJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText)  + coord_flip()
+
+q12_likseinkaufJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+
+```
+
+
 
