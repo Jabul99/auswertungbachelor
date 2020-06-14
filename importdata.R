@@ -557,3 +557,102 @@ getfrequenz1Dimension <- function(x, NumberOfItems, RowNamesLevels, itemNumbers)
 }
 
 
+
+q15_EmailNewsletterprivat <- subset(dat, select=c("Nummer", "X15_1_1", "X15_2_1","X15_3_1", "X15_4_1", "X15_5_1", "X15_6_1"))
+q15_EmailNewsletterprivat <- q15_EmailNewsletterprivat  %>% rename(Intresse = X15_1_1, Aktionen = X15_2_1,
+                                                                   Angebot = X15_3_1, Inhalt = X15_4_1, Trends = X15_5_1, Unternehmen = X15_6_1)
+
+q15_EmailNewsletterfirm <- subset(dat, select=c("Nummer", "X15_1_2", "X15_2_2","X15_3_2", "X15_4_2", "X15_5_2", "X15_6_2"))
+q15_EmailNewsletterfirm <- q15_EmailNewsletterfirm  %>% rename(Intresse = X15_1_2, Aktionen = X15_2_2,
+                                                               Angebot = X15_3_2, Inhalt = X15_4_2, Trends = X15_5_2, Unternehmen = X15_6_2)
+
+
+q15_EmailNewsletterprivatAngepasst <- q15_EmailNewsletterprivat %>% gather(Intresse, Aktionen, Angebot, Inhalt, Trends, Unternehmen, key = Grund, value = Frequenz)
+q15_EmailNewsletterprivatAngepasst <- q15_EmailNewsletterprivatAngepasst %>% mutate(Art = 1)
+q15_EmailNewsletterfirmAngepasst <- q15_EmailNewsletterfirm %>% gather(Intresse, Aktionen, Angebot, Inhalt, Trends, Unternehmen, key = Grund, value = Frequenz)
+q15_EmailNewsletterfirmAngepasst <- q15_EmailNewsletterfirmAngepasst %>% mutate(Art = 2)
+
+
+q15_EmailNewsletter <- rbind(q15_EmailNewsletterprivatAngepasst,q15_EmailNewsletterfirmAngepasst)
+
+
+q15_EmailNewsletter %>% ggplot(aes(x=Art, y=Frequenz, fill= Grund)) + geom_histogram(position = "dodge2") + xlab("") + ylab("Anzahl") + coord_flip()
+
+q14_Vertrauen <- subset(dat, select=c("Nummer", "X14_1", "X14_2", "X14_3", "X14_4", "X14_5", "X14_6", "X14_7", "X14_8"))
+q14_Vertrauen <-  q14_Vertrauen %>% rename(Vergleichsdienste = X14_1, Blogs = X14_2, Influencer = X14_3, Freunde = X14_4, Mitarbeiter = X14_5, Webseite = X14_6, SocialMedia = X14_7, Email = X14_8)
+
+columnNames1 <- c("Vergleichsdienste", "Blogs", "Influencer", "Freunde", "Mitarbeiter", "Webseite", "SocialMedia", "Email")
+
+levels = c("nicht vertrauenswürdig", "wenig vertrauenswürdig", "mittelmässig vertrauenswürdig","ziemlich vertrauenswürdig","sehr vertrauenswürdig")
+q14_VertrauenAngepasst <- q14_Vertrauen %>% subset(select =              c(Nummer,Vergleichsdienste, Blogs, Influencer, Freunde, Mitarbeiter, Webseite, SocialMedia, Email)) %>% 
+  mutate(
+    Vergleichsdienste = case_when(
+      Vergleichsdienste == 1 ~ levels[1], 
+      Vergleichsdienste == 2 ~ levels[2], 
+      Vergleichsdienste == 3 ~ levels[3],
+      Vergleichsdienste == 4 ~ levels[4],
+      Vergleichsdienste == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    Blogs = case_when(
+      Blogs == 1 ~ levels[1], 
+      Blogs == 2 ~ levels[2], 
+      Blogs == 3 ~ levels[3],
+      Blogs == 4 ~ levels[4],
+      Blogs == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    Influencer = case_when(
+      Influencer == 1 ~ levels[1], 
+      Influencer == 2 ~ levels[2], 
+      Influencer == 3 ~ levels[3],
+      Influencer == 4 ~ levels[4],
+      Influencer == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    Freunde = case_when(
+      Freunde == 1 ~ levels[1], 
+      Freunde == 2 ~ levels[2], 
+      Freunde == 3 ~ levels[3],
+      Freunde == 4 ~ levels[4],
+      Freunde == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    Mitarbeiter = case_when(
+      Mitarbeiter == 1 ~ levels[1], 
+      Mitarbeiter == 2 ~ levels[2], 
+      Mitarbeiter == 3 ~ levels[3],
+      Mitarbeiter == 4 ~ levels[4],
+      Mitarbeiter == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    Webseite = case_when(
+      Webseite == 1 ~ levels[1], 
+      Webseite == 2 ~ levels[2], 
+      Webseite == 3 ~ levels[3],
+      Webseite == 4 ~ levels[4],
+      Webseite == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    Email = case_when(
+      Email == 1 ~ levels[1], 
+      Email == 2 ~ levels[2], 
+      Email == 3 ~ levels[3],
+      Email == 4 ~ levels[4],
+      Email == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels),
+    SocialMedia = case_when(
+      SocialMedia == 1 ~ levels[1], 
+      SocialMedia == 2 ~ levels[2], 
+      SocialMedia == 3 ~ levels[3],
+      SocialMedia == 4 ~ levels[4],
+      SocialMedia == 5 ~ levels[5],
+      TRUE ~  levels[1]) %>% factor(levels))
+
+q14_VertrauenAngepasst <- q14_VertrauenAngepasst %>% gather(Vergleichsdienste, Blogs, Influencer, Freunde, Mitarbeiter, Webseite, SocialMedia, Email, key = Quelle, value = Frequenz)
+
+
+q14_VertrauenAngepasst$Quelle <- as.factor(q14_VertrauenAngepasst$Quelle)
+q14_VertrauenAngepasst$Frequenz <- as.factor(q14_VertrauenAngepasst$Frequenz)
+q14_VertrauenAngepasst$Quelle <- factor(q14_VertrauenAngepasst$Quelle, levels = columnNames1)
+q14_VertrauenAngepasst$Frequenz <- factor(q14_VertrauenAngepasst$Frequenz, levels = levels)
+
+
+q14_VertrauenJoined <- left_join(q14_VertrauenAngepasst,q23_Geschlecht, by = "Nummer")
+q14_VertrauenJoined <- left_join(q14_VertrauenJoined, q24_Alter, by = "Nummer")
+
+q14_VertrauenAngepasst %>% ggplot(aes(x=Frequenz, fill= Quelle)) + geom_bar(position = "dodge2") + xlab("Quelle") + ylab("Anzahl") + coord_flip()
