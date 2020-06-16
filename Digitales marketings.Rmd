@@ -100,6 +100,127 @@ getfrequenz <- function(x, NumberOfItems, RowNamesLevels, ColumnNames, itemNumbe
   return(resultDataframe)
 }
 
+getfrequenzgeschlecht <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
+  numberofColumns <- ncol(x)
+  numberoflevels <- nlevels(Rowfactors)
+  itemsoflevels <- c(1:numberoflevels)
+  
+  numberoflevels2 <- numberoflevels * 2
+  items <- c(1:numberoflevels2)
+  
+  numberofColumnNames = length(ColumnNames)
+  itemscolums <- c(1: numberofColumnNames)
+  
+
+  resultDataframe <- data.frame()
+  
+  rownumber <- 0
+  nummerforItem <- 0
+  for(itemNumber in itemsoflevels){
+    rownumber <- rownumber + 1
+    nummerforItem <- nummerforItem +1
+    
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("männlich")
+    
+    rownumber <- rownumber + 1
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("weiblich")
+  }
+  
+  resultDataframe <- resultDataframe %>% rename(
+    Nr = V1,
+    Feld = V2,
+    Auspraegung = V3)
+  
+  for(itemNumber in itemscolums){
+  columnname = ColumnNames[itemNumber]
+  resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "0.00% (0)")
+  }
+   if(TotalAnzeigen){
+    resultDataframe <- resultDataframe %>% mutate(Summe = "0")
+  }
+
+  correctRow <- 1
+  for(numberofCurrentColumn in itemsoflevels){
+
+    numbers <- transform(as.data.frame(table(x[,numberofCurrentColumn], x$Geschlecht)), 
+                         percentagem = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Geschlecht == 1))*100, digits = 2),
+                         percentagew = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Geschlecht == 2))*100, digits = 2))
+    
+    numbers$Var1 <- as.numeric(as.character(numbers$Var1))
+    numbers$Var2 <- as.numeric(as.character(numbers$Var2))
+    
+    numbers<- numbers[order(numbers$Var1,numbers$Var2),]
+    
+    summeItemsm <- 0
+    summeItemsw <- 0
+    for(val in items)
+    {
+      if(!is.na(numbers[val,1]))
+      {
+        columnnumber <- as.numeric(numbers[val,1]) +3
+        rownumber <- 0
+        if(as.numeric(numbers[val,2]) %% 2 == 0)
+          {
+          rownumber <- correctRow + 1
+          resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers[val,5]), "% (",as.character(numbers[val,3]), ")", sep ="")
+          summeItemsw <- summeItemsw + as.numeric(numbers[val,3])
+          }
+        else
+        { 
+          rownumber <- correctRow
+          resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers[val,4]), "% (",as.character(numbers[val,3]), ")", sep ="")
+          summeItemsm <- summeItemsm + as.numeric(numbers[val,3])
+          }
+
+
+
+      }
+      if(TotalAnzeigen){
+        resultDataframe[correctRow,numberofColumnNames +4] <- summeItemsm
+        resultDataframe[correctRow+1,numberofColumnNames +4] <- summeItemsw
+      }
+    }
+    
+    correctRow <- correctRow + 2
+  }
+
+  return(resultDataframe)
+  }
+
+getfrequenz1Dimension <- function(x, NumberOfItems, RowNamesLevels, itemNumbers){
+  items <- c(1:NumberOfItems)
+  
+  resultDataframe <- data.frame(Nr = itemNumbers, Feld = RowNamesLevels)
+  resultDataframe <- resultDataframe %>% mutate(Antwortanzahl= "0.00% (0)")
+  
+  numbers <- transform(as.data.frame(table(x[1])), percentage = round(Freq/nrow(x)*100, digits = 2))
+  numbers$Var1 <- as.numeric(as.character(numbers$Var1))
+  
+   summeItems <- 0
+   rownumber <- 0
+  for(val in items)
+  {
+    if(!is.na(numbers[val,1]))
+    {
+      columnnumber <- 3
+      rownumber <- as.numeric(numbers[val,1])
+      
+      resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers[val,3]), "% (",as.character(numbers[val,2]), ")", sep ="")
+      
+      summeItems <- summeItems + as.numeric(numbers[val,2])
+    }
+  }
+   resultDataframe[rownumber+1,1] <- c("Total")
+  
+  resultDataframe[rownumber+1,3] <- paste("100", "% (",summeItems, ")", sep ="")
+  
+  return(resultDataframe)
+}
+
 
 getLageparameter <- function(x, RowNamesLevels, itemNumbers){
   numberofColumns <-ncol(x)
@@ -141,41 +262,21 @@ getLageparameter1Dimensional <- function(x, TitelField){
   return(resultDataframe)
 }
 
-getfrequenz1Dimension <- function(x, NumberOfItems, RowNamesLevels, itemNumbers){
-  items <- c(1:NumberOfItems)
-  
-  resultDataframe <- data.frame(Nr = itemNumbers, Feld = RowNamesLevels)
-  resultDataframe <- resultDataframe %>% mutate(Antwortanzahl= "0.00% (0)")
-  
-  numbers <- transform(as.data.frame(table(x[1])), percentage = round(Freq/nrow(x)*100, digits = 2))
-  numbers$Var1 <- as.numeric(as.character(numbers$Var1))
-  
-   summeItems <- 0
-   rownumber <- 0
-  for(val in items)
-  {
-    if(!is.na(numbers[val,1]))
-    {
-      columnnumber <- 3
-      rownumber <- as.numeric(numbers[val,1])
-      
-      resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers[val,3]), "% (",as.character(numbers[val,2]), ")", sep ="")
-      
-      summeItems <- summeItems + as.numeric(numbers[val,2])
-    }
-  }
-   resultDataframe[rownumber+1,1] <- c("Total")
-  
-  resultDataframe[rownumber+1,3] <- paste("100", "% (",summeItems, ")", sep ="")
-  
-  return(resultDataframe)
-}
+
 
 JoinTableAlterAndGeschlecht <- function(x){
   newtable <- left_join(x,q23_Geschlecht, by = "Nummer")
 newtable <- left_join(newtable, q24_Alter, by = "Nummer")
 newtable <- newtable %>% filter(!is.na(Geschlecht))
 newtable <- newtable %>% filter(!is.na(Alter))
+return(newtable)
+}
+
+JoinTableGeschlecht <- function(x){
+  geschlectfiltertabe <- q23_Geschlecht %>% subset(select = c(Nummer,Geschlecht))
+newtable <- left_join(x,geschlectfiltertabe, by = "Nummer")
+newtable <- newtable %>% filter(!is.na(Geschlecht))
+newtable <- subset(newtable, select = -c(Nummer))
 return(newtable)
 }
 
@@ -310,7 +411,7 @@ q1_SuchmaschineAngepasst <- q1_SuchmaschineAngepasst %>% filter(!is.na(Frequenz)
 q1_SuchmaschineAngepasst$Suchmaschine <- as.factor(q1_SuchmaschineAngepasst$Suchmaschine)
 q1_SuchmaschineAngepasst$Frequenz <- as.factor(q1_SuchmaschineAngepasst$Frequenz)
 q1_SuchmaschineAngepasst$Suchmaschine <- factor(q1_SuchmaschineAngepasst$Suchmaschine, levels = c("google", "bing", "yahoo","search.ch","escosia.org", "Andere"))
-q1_SuchmaschineAngepasst$Frequenz <- factor(q1_SuchmaschineAngepasst$Frequenz, levels = c("nie", "selten", "monatlich","wöchentlich","nahezu täglich"))
+q1_SuchmaschineAngepasst$Frequenz <- factor(q1_SuchmaschineAngepasst$Frequenz, levels2)
 
 
 q1_SuchmaschineJoined <- JoinTableAlterAndGeschlecht(q1_SuchmaschineAngepasst)
@@ -334,12 +435,7 @@ knitr::kable(
   q1_lageparameter, longtable = TRUE, booktabs = TRUE
 )
 
-q1_frequenz <- getfrequenz(subset(q1_Suchmaschine, select = c(google, bing, yahoo, search.ch, escosia.org, Andere)),5,levels(q1_SuchmaschineJoined$Suchmaschine), c(
-  "nie",
-  "selten",
-  "monatlich", 
-  "wöchentlich",
-  "nahezu täglich"), c(1:6), TRUE)
+q1_frequenz <- getfrequenz(subset(q1_Suchmaschine, select = c(google, bing, yahoo, search.ch, escosia.org, Andere)),5,levels(q1_SuchmaschineJoined$Suchmaschine), levels2, c(1:6), TRUE)
 
 knitr::kable(
   q1_frequenz, longtable = TRUE, booktabs = TRUE
@@ -349,6 +445,15 @@ q1_SuchmaschineJoined %>% ggplot(aes(x=Frequenz, fill= Suchmaschine)) + geom_bar
 
 q1_SuchmaschineJoined %>% ggplot(aes(x=Frequenz, fill= Suchmaschine)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
 
+
+q1_SuchmaschineJoinedGeschlecht <- JoinTableGeschlecht(q1_Suchmaschine %>% subset(select =c(Nummer, google, bing, yahoo, search.ch, escosia.org, Andere)))
+
+q1_frequenzgeschlecht <- getfrequenzgeschlecht(q1_SuchmaschineJoinedGeschlecht,factor(c("google", "bing", "yahoo", "search.ch", "esosia.org", "Andere")), 
+                            c("nie", "selten", "monatlich","wöchentlich","nahezu täglich"), TRUE)
+
+knitr::kable(
+  q1_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
 
 ```
 

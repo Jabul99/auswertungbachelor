@@ -146,3 +146,6 @@ q1_SuchmaschineJoined %>% ggplot(aes(x=Frequenz, fill= Suchmaschine)) + geom_bar
 q1_SuchmaschineJoined %>% ggplot(aes(x=Frequenz, fill= Suchmaschine)) + geom_bar(position = "dodge2") + 
   xlab("Frequenz") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 3, scales = "free", as.table = TRUE )  + coord_flip()
 
+
+q1_SuchmaschineJoined %>% ggplot(aes(x=Frequenz, fill= Suchmaschine)) + geom_bar(position = "dodge2") 
++ xlab() + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
