@@ -12,11 +12,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r load-packages, include=FALSE}
+library(plyr)
 library(dplyr)
 library(tidyverse)
 library(magrittr)
 library(knitr)
-library(dplyr)
 library(stringr)
  options(knitr.kable.NA = '')
 ```
@@ -67,7 +67,12 @@ getfrequenz <- function(x, NumberOfItems, RowNamesLevels, ColumnNames, itemNumbe
   
   for(itemNumber in items){
     columnname = ColumnNames[itemNumber]
+    if(TotalAnzeigen){
     resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "0.00% (0)")
+    }else
+    {
+      resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "(0)")
+    }
   }
   
         if(TotalAnzeigen){
@@ -87,8 +92,9 @@ getfrequenz <- function(x, NumberOfItems, RowNamesLevels, ColumnNames, itemNumbe
         columnnumber <- as.numeric(numbers[val,1]) +2
         rownumber <- numberofCurrentColumn
         
-        resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers[val,3]), "% (",as.character(numbers[val,2]), ")", sep ="")
-        
+        resultDataframe[rownumber,columnnumber] <-  paste(if_else(TotalAnzeigen, 
+                                                                   paste(as.character(numbers[val,3]),"% ", sep =""), ""), "(",as.character(numbers[val,2]), ")", sep ="")
+
         summeItems <- summeItems + as.numeric(numbers[val,2])
       }
       if(TotalAnzeigen){
@@ -137,10 +143,17 @@ getfrequenzgeschlecht <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
   
   for(itemNumber in itemscolums){
   columnname = ColumnNames[itemNumber]
-  resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "0.00% (0)")
-  }
    if(TotalAnzeigen){
-    resultDataframe <- resultDataframe %>% mutate(Summe = "0")
+  resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "0.00% (0)")
+   }
+  else
+   {
+      resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "(0)")
+    }
+  }
+  
+   if(TotalAnzeigen){
+    resultDataframe <- resultDataframe %>% mutate(Summe = "(0)")
   }
 
   correctRow <- 1
@@ -166,17 +179,19 @@ getfrequenzgeschlecht <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
         if(as.numeric(numbers[val,2]) %% 2 == 0)
           {
           rownumber <- correctRow + 1
-          resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers[val,5]), "% (",as.character(numbers[val,3]), ")", sep ="")
+          
+          if(TotalAnzeigen){
+          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
+                                                                   paste(as.character(numbers[val,5]),"% ", sep =""), ""),  "(",as.character(numbers[val,3]), ")", sep ="")
           summeItemsw <- summeItemsw + as.numeric(numbers[val,3])
           }
         else
         { 
           rownumber <- correctRow
-          resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers[val,4]), "% (",as.character(numbers[val,3]), ")", sep ="")
+          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
+                                                                   paste(as.character(numbers[val,4]),"% ", sep =""), ""), "(",as.character(numbers[val,3]), ")", sep ="")
           summeItemsm <- summeItemsm + as.numeric(numbers[val,3])
           }
-
-
 
       }
       if(TotalAnzeigen){
@@ -190,6 +205,167 @@ getfrequenzgeschlecht <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
 
   return(resultDataframe)
   }
+}
+
+
+getfrequenzAlter <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
+  numberofColumns <- ncol(x)
+  numberoflevels <- nlevels(Rowfactors)
+  itemsoflevels <- c(1:numberoflevels)
+  
+  numberoflevels2 <- numberoflevels * 6
+  items <- c(1:numberoflevels2)
+  
+  numberofColumnNames = length(ColumnNames)
+  itemscolums <- c(1: numberofColumnNames)
+  
+  
+  resultDataframe <- data.frame()
+  
+  rownumber <- 0
+  nummerforItem <- 0
+  for(itemNumber in itemsoflevels){
+    rownumber <- rownumber + 1
+    nummerforItem <- nummerforItem +1
+    
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("18-25")
+    
+    rownumber <- rownumber + 1
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("26-32")
+    
+    rownumber <- rownumber + 1
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("33-40")
+    
+    rownumber <- rownumber + 1
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("41-55")
+    
+    rownumber <- rownumber + 1
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("56-65")
+    
+    rownumber <- rownumber + 1
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("über 65")
+  }
+  
+  resultDataframe <- resultDataframe %>% rename(
+    Nr = V1,
+    Feld = V2,
+    Auspraegung = V3)
+  
+  for(itemNumber in itemscolums){
+    columnname = ColumnNames[itemNumber]
+    
+    if(TotalAnzeigen){
+    resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "0.00% (0)")
+    }
+    else{
+      resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "(0)")
+    }
+  }
+  if(TotalAnzeigen){
+    resultDataframe <- resultDataframe %>% mutate(Summe = "0")
+  }
+  
+  correctRow <- 1
+  for(numberofCurrentColumn in itemsoflevels){
+    
+    numbers <- transform(as.data.frame(table(x[,numberofCurrentColumn], x$Alter)), 
+                         percentage18 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 2))*100, digits = 2),
+                         percentage26 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 3))*100, digits = 2),
+    percentage33 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 4))*100, digits = 2),
+    percentage41 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 5))*100, digits = 2),
+    percentage55 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 6))*100, digits = 2),
+    percentage65 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 7))*100, digits = 2))
+
+    numbers$Var1 <- as.numeric(as.character(numbers$Var1))
+    numbers$Var2 <- as.numeric(as.character(numbers$Var2))
+    
+    numbers<- numbers[order(numbers$Var1,numbers$Var2),]
+    
+    summeItems18 <- 0
+    summeItems26 <- 0
+    summeItems33 <- 0
+    summeItems41 <- 0
+    summeItems56 <- 0
+    summeItems65 <- 0
+    for(val in items)
+    {
+      if(!is.na(numbers[val,1]))
+      {
+        columnnumber <- as.numeric(numbers[val,1]) +3
+        rownumber <- 0
+        if(as.numeric(numbers[val,2]) == 7 )
+        {
+          rownumber <- correctRow + 5
+          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
+                                                                   paste(as.character(numbers[val,9]),"% ", sep =""), ""), "(",as.character(numbers[val,3]), ")", sep ="")
+          summeItems65 <- summeItems65 + as.numeric(numbers[val,3])
+        }
+        else if(as.numeric(numbers[val,2]) == 6)
+        { 
+          rownumber <- correctRow + 4
+          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
+                                                                   paste(as.character(numbers[val,8]),"% ", sep =""), ""), "(",as.character(numbers[val,3]), ")", sep ="")
+          summeItems56 <- summeItems56 + as.numeric(numbers[val,3])
+        }
+        else if(as.numeric(numbers[val,2]) == 5)
+        { 
+          rownumber <- correctRow + 3
+          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
+                                                                   paste(as.character(numbers[val,7]),"% ", sep =""), ""), "(",as.character(numbers[val,3]), ")", sep ="")
+          summeItems41 <- summeItems41 + as.numeric(numbers[val,3])
+        }
+        else if(as.numeric(numbers[val,2]) == 4)
+        { 
+          rownumber <- correctRow + 2
+          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
+                                                                   paste(as.character(numbers[val,6]),"% ", sep =""), ""), "(",as.character(numbers[val,3]), ")", sep ="")
+          summeItems33 <- summeItems33 + as.numeric(numbers[val,3])
+        }
+        else if(as.numeric(numbers[val,2]) == 3)
+        { 
+          rownumber <- correctRow + 1
+          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
+                                                                   paste(as.character(numbers[val,5]),"% ", sep =""), ""), "(",as.character(numbers[val,3]), ")", sep ="")
+          summeItems26 <- summeItems26 + as.numeric(numbers[val,3])
+        }
+        else if(as.numeric(numbers[val,2]) == 2)
+        { 
+          rownumber <- correctRow
+          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
+                                                                   paste(as.character(numbers[val,4]),"% ", sep =""), ""), "(",as.character(numbers[val,3]), ")", sep ="")
+          summeItems18 <- summeItems18 + as.numeric(numbers[val,3])
+        }
+        
+        
+        
+      }
+      if(TotalAnzeigen){
+        resultDataframe[correctRow,numberofColumnNames +4] <- summeItems18
+        resultDataframe[correctRow+1,numberofColumnNames +4] <- summeItems26
+        resultDataframe[correctRow+2,numberofColumnNames +4] <- summeItems33
+        resultDataframe[correctRow+3,numberofColumnNames +4] <- summeItems41
+        resultDataframe[correctRow+4,numberofColumnNames +4] <- summeItems56
+        resultDataframe[correctRow+5,numberofColumnNames +4] <- summeItems65
+      }
+    }
+    
+    correctRow <- correctRow + 6
+  }
+  
+  return(resultDataframe)
+}
 
 getfrequenz1Dimension <- function(x, NumberOfItems, RowNamesLevels, itemNumbers){
   items <- c(1:NumberOfItems)
@@ -217,6 +393,248 @@ getfrequenz1Dimension <- function(x, NumberOfItems, RowNamesLevels, itemNumbers)
    resultDataframe[rownumber+1,1] <- c("Total")
   
   resultDataframe[rownumber+1,3] <- paste("100", "% (",summeItems, ")", sep ="")
+  
+  return(resultDataframe)
+}
+
+getfrequenz1DimensionGeschlecht <- function(x, Rowfactors){
+  numberofColumns <- ncol(x)
+  numberoflevels <- nlevels(Rowfactors)
+  itemsoflevels <- c(1:numberoflevels)
+  
+  numberoflevels2 <- numberoflevels
+  items <- c(1:numberoflevels2)
+
+  
+  resultDataframe <- data.frame()
+
+  
+  rownumber <- 0
+  nummerforItem <- 0
+  for(itemNumber in itemsoflevels){
+    rownumber <- rownumber + 1
+    nummerforItem <- nummerforItem +1
+    
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("männlich")
+    
+    rownumber <- rownumber + 1
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("weiblich")
+  }
+  
+  resultDataframe <- resultDataframe %>% rename(
+    Nr = V1,
+    Feld = V2,
+    Auspraegung = V3)
+  
+
+  resultDataframe <- resultDataframe %>% mutate(Antwortanzahl= "0.00% (0)")
+
+  
+  numbers <- transform(as.data.frame(table(x)), 
+                       percentagem = round(Freq/length(which(!is.na(x[1]) & x$Geschlecht == 1))*100, digits = 2),
+                       percentagew = round(Freq/length(which(!is.na(x[1]) & x$Geschlecht == 2))*100, digits = 2))
+  
+
+  numbers[,1] <- as.numeric(as.character(numbers[,1]))
+  numbers[,2] <- as.numeric(as.character(numbers[,2]))
+  
+  numbersm<- numbers[numbers$Geschlecht == 1,]
+  numbersw<- numbers[numbers$Geschlecht == 2,]
+  
+  summeItemsm <- 0
+  summeItemsw <- 0
+  correctRow <- 1
+  for(val in items)
+  {
+    columnnumber <- 4
+    
+    if(!is.na(numbersm[val,1]))
+    { 
+      rownumber <- correctRow
+      resultDataframe[rownumber,columnnumber] <-paste(as.character(numbersm[val,4]),"% ", "(",as.character(numbersm[val,3]), ")", sep ="")
+      summeItemsm <- summeItemsm + as.numeric(numbersm[val,3])
+    }
+    
+    if(!is.na(numbersw[val,1]))
+    {
+      rownumber <- correctRow + 1
+              resultDataframe[rownumber,columnnumber] <- paste(as.character(numbersw[val,5]),"% ", "(",as.character(numbersw[val,3]), ")", sep ="")
+        summeItemsw <- summeItemsw + as.numeric(numbersw[val,3])
+      }
+
+    correctRow <- correctRow + 2
+    
+    }
+
+  resultDataframe[correctRow,1] <- c("Total")
+    resultDataframe[correctRow,4] <- paste("(",summeItemsm, ")", sep ="")
+    
+    correctRow <- correctRow + 1
+    resultDataframe[correctRow,1] <- c("Total")
+    resultDataframe[correctRow,4] <- paste("(",summeItemsw, ")", sep ="")
+
+  
+  return(resultDataframe)
+}
+
+getfrequenz1DimensionAlter <- function(x, Rowfactors){
+  numberofColumns <- ncol(x)
+  numberoflevels <- nlevels(Rowfactors)
+  itemsoflevels <- c(1:numberoflevels)
+  
+  numberoflevels2 <- numberoflevels
+  items <- c(1:numberoflevels2)
+  
+  
+  resultDataframe <- data.frame()
+  
+  
+  rownumber <- 0
+  nummerforItem <- 0
+  for(itemNumber in itemsoflevels){
+    rownumber <- rownumber + 1
+    nummerforItem <- nummerforItem +1
+    
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("18-25")
+    
+    rownumber <- rownumber + 1
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("26-32")
+    
+    rownumber <- rownumber + 1
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("33-40")
+    
+    rownumber <- rownumber + 1
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("41-55")
+    
+    rownumber <- rownumber + 1
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("56-65")
+    
+    rownumber <- rownumber + 1
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("über 65")
+  }
+  
+  resultDataframe <- resultDataframe %>% rename(
+    Nr = V1,
+    Feld = V2,
+    Auspraegung = V3)
+  
+  
+  resultDataframe <- resultDataframe %>% mutate(Antwortanzahl= "0.00% (0)")
+  
+  
+  numbers <- transform(as.data.frame(table(x)), 
+                       percentage18 = round(Freq/length(which(!is.na(x[1]) & x$Alter == 2))*100, digits = 2),
+                       percentage26 = round(Freq/length(which(!is.na(x[1]) & x$Alter == 3))*100, digits = 2),
+                       percentage33 = round(Freq/length(which(!is.na(x[1]) & x$Alter == 4))*100, digits = 2),
+                       percentage41 = round(Freq/length(which(!is.na(x[1]) & x$Alter == 5))*100, digits = 2),
+                       percentage55 = round(Freq/length(which(!is.na(x[1]) & x$Alter == 6))*100, digits = 2),
+                       percentage65 = round(Freq/length(which(!is.na(x[1]) & x$Alter == 7))*100, digits = 2))
+
+  numbers[,1] <- as.numeric(as.character(numbers[,1]))
+  numbers[,2] <- as.numeric(as.character(numbers[,2]))
+  
+  numbers18<- numbers[numbers$Alter == 2,]
+  numbers26<- numbers[numbers$Alter == 3,]
+  numbers33<- numbers[numbers$Alter == 4,]
+  numbers41<- numbers[numbers$Alter == 5,]
+  numbers55<- numbers[numbers$Alter == 6,]
+  numbers65<- numbers[numbers$Alter == 7,]
+  
+  summeItems18 <- 0
+  summeItems26 <- 0
+  summeItems33 <- 0
+  summeItems41 <- 0
+  summeItems55 <- 0
+  summeItems65 <- 0
+  correctRow <- 1
+  for(val in items)
+  {
+    columnnumber <- 4
+    
+    if(!is.na(numbers18[val,1]))
+    { 
+      rownumber <- correctRow
+      resultDataframe[rownumber,columnnumber] <-paste(as.character(numbers18[val,4]),"% ", "(",as.character(numbers18[val,3]), ")", sep ="")
+      summeItems18 <- summeItems18 + as.numeric(numbers18[val,3])
+    }
+    
+    if(!is.na(numbers26[val,1]))
+    {
+      rownumber <- correctRow + 1
+      resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers26[val,5]),"% ", "(",as.character(numbers26[val,3]), ")", sep ="")
+      summeItems26 <- summeItems26 + as.numeric(numbers26[val,3])
+    }
+    
+    if(!is.na(numbers33[val,1]))
+    {
+      rownumber <- correctRow + 2
+      resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers33[val,6]),"% ", "(",as.character(numbers33[val,3]), ")", sep ="")
+      summeItems33 <- summeItems33 + as.numeric(numbers33[val,3])
+    }
+    
+    if(!is.na(numbers41[val,1]))
+    {
+      rownumber <- correctRow + 3
+      resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers41[val,7]),"% ", "(",as.character(numbers41[val,3]), ")", sep ="")
+      summeItems41 <- summeItems41 + as.numeric(numbers41[val,3])
+    }
+    
+    if(!is.na(numbers55[val,1]))
+    {
+      rownumber <- correctRow + 4
+      resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers55[val,8]),"% ", "(",as.character(numbers55[val,3]), ")", sep ="")
+      summeItems55 <- summeItems55 + as.numeric(numbers55[val,3])
+    }
+    
+    if(!is.na(numbers65[val,1]))
+    {
+      rownumber <- correctRow + 5
+      resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers65[val,9]),"% ", "(",as.character(numbers65[val,3]), ")", sep ="")
+      summeItems65 <- summeItems65 + as.numeric(numbers65[val,3])
+    }
+    
+    correctRow <- correctRow + 6
+    
+  }
+  
+  resultDataframe[correctRow,1] <- c("Total")
+  resultDataframe[correctRow,4] <- paste("(",summeItems18, ")", sep ="")
+  
+  correctRow <- correctRow + 1
+  resultDataframe[correctRow,1] <- c("Total")
+  resultDataframe[correctRow,4] <- paste("(",summeItems26, ")", sep ="")
+  
+  correctRow <- correctRow + 1
+  resultDataframe[correctRow,1] <- c("Total")
+  resultDataframe[correctRow,4] <- paste("(",summeItems33, ")", sep ="")
+  
+  correctRow <- correctRow + 1
+  resultDataframe[correctRow,1] <- c("Total")
+  resultDataframe[correctRow,4] <- paste("(",summeItems41, ")", sep ="")
+  
+  correctRow <- correctRow + 1
+  resultDataframe[correctRow,1] <- c("Total")
+  resultDataframe[correctRow,4] <- paste("(",summeItems55, ")", sep ="")
+  
+  correctRow <- correctRow + 1
+  resultDataframe[correctRow,1] <- c("Total")
+  resultDataframe[correctRow,4] <- paste("(",summeItems65, ")", sep ="")
   
   return(resultDataframe)
 }
@@ -262,8 +680,6 @@ getLageparameter1Dimensional <- function(x, TitelField){
   return(resultDataframe)
 }
 
-
-
 JoinTableAlterAndGeschlecht <- function(x){
   newtable <- left_join(x,q23_Geschlecht, by = "Nummer")
 newtable <- left_join(newtable, q24_Alter, by = "Nummer")
@@ -279,6 +695,15 @@ newtable <- newtable %>% filter(!is.na(Geschlecht))
 newtable <- subset(newtable, select = -c(Nummer))
 return(newtable)
 }
+
+JoinTableAlter <- function(x){
+  alterfiltertabe <- q24_Alter %>% subset(select = c(Nummer,Alter))
+  newtable <- left_join(x,alterfiltertabe, by = "Nummer")
+  newtable <- newtable %>% filter(!is.na(Alter))
+  newtable <- subset(newtable, select = -c(Nummer))
+  return(newtable)
+}
+
 
 
 ```
@@ -441,15 +866,24 @@ knitr::kable(
   q1_frequenz, longtable = TRUE, booktabs = TRUE
 )
 
+frequenzfactors <- factor(c("google", "bing", "yahoo", "search.ch", "esosia.org", "Andere"))
+
 q1_SuchmaschineJoined %>% ggplot(aes(x=Frequenz, fill= Suchmaschine)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free")  + coord_flip()
+
+q1_SuchmaschineJoinedAlter <- JoinTableAlter(q1_Suchmaschine %>% subset(select =c(Nummer, google, bing, yahoo, search.ch, escosia.org, Andere)))
+
+q1_frequenzalter<- getfrequenzAlter(q1_SuchmaschineJoinedAlter, frequenzfactors, levels2, TRUE)
+
+knitr::kable(
+  q1_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
 
 q1_SuchmaschineJoined %>% ggplot(aes(x=Frequenz, fill= Suchmaschine)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
 
 
 q1_SuchmaschineJoinedGeschlecht <- JoinTableGeschlecht(q1_Suchmaschine %>% subset(select =c(Nummer, google, bing, yahoo, search.ch, escosia.org, Andere)))
 
-q1_frequenzgeschlecht <- getfrequenzgeschlecht(q1_SuchmaschineJoinedGeschlecht,factor(c("google", "bing", "yahoo", "search.ch", "esosia.org", "Andere")), 
-                            c("nie", "selten", "monatlich","wöchentlich","nahezu täglich"), TRUE)
+q1_frequenzgeschlecht <- getfrequenzgeschlecht(q1_SuchmaschineJoinedGeschlecht,frequenzfactors,levels2, TRUE)
 
 knitr::kable(
   q1_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
@@ -498,7 +932,23 @@ q2_bezahlteLinksJoined <- JoinTableAlterAndGeschlecht(q2_bezahlteLinksAngepasst)
 
 q2_bezahlteLinksJoined %>% ggplot(aes(x=ZweiteSeite)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q2_bezahlteLinksJoinedGeschlecht <- JoinTableGeschlecht(q2_bezahlteLinks)
+q_frequenzGeschlecht <- getfrequenz1DimensionGeschlecht(q2_bezahlteLinksJoinedGeschlecht,factor(levels2))
+
+knitr::kable(
+  q_frequenzGeschlecht, longtable = TRUE, booktabs = TRUE
+)
+
+
 q2_bezahlteLinksJoined %>% ggplot(aes(x=ZweiteSeite)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q2_bezahlteLinksJoinedAlter <- JoinTableAlter(q2_bezahlteLinks)
+q_frequenzAlter <- getfrequenz1DimensionAlter(q2_bezahlteLinksJoinedAlter,factor(levels2))
+
+
+knitr::kable(
+  q_frequenzAlter, longtable = TRUE, booktabs = TRUE
+)
 
 ```
 
@@ -545,7 +995,22 @@ q3_bezahlteLinksJoined <- JoinTableAlterAndGeschlecht(q3_bezahlteLinksAngepasst)
 
 q3_bezahlteLinksJoined %>% ggplot(aes(x=ProzentBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q3_bezahlteLinksJoinedGeschlecht <- JoinTableGeschlecht(q3_bezahlteLinks)
+q_frequenzGeschlecht <- getfrequenz1DimensionGeschlecht(q3_bezahlteLinksJoinedGeschlecht,factor(levels2))
+
+knitr::kable(
+  q_frequenzGeschlecht, longtable = TRUE, booktabs = TRUE
+)
+
 q3_bezahlteLinksJoined %>% ggplot(aes(x=ProzentBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q3_bezahlteLinksJoinedAlter <- JoinTableAlter(q3_bezahlteLinks)
+q_frequenzAlter <- getfrequenz1DimensionAlter(q3_bezahlteLinksJoinedAlter,factor(levels2))
+
+
+knitr::kable(
+  q_frequenzAlter, longtable = TRUE, booktabs = TRUE
+)
 
 ```
 
@@ -591,9 +1056,25 @@ knitr::kable(
 
 q4_bezahlteLinksJoined <- JoinTableAlterAndGeschlecht(q4_bezahlteLinksAngepasst)
 
+
 q4_bezahlteLinksJoined %>% ggplot(aes(x=ProzentKaufBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q4_bezahlteLinksJoinedGeschlecht <- JoinTableGeschlecht(q4_bezahlteLinks)
+q_frequenzGeschlecht <- getfrequenz1DimensionGeschlecht(q4_bezahlteLinksJoinedGeschlecht,factor(levels2))
+
+knitr::kable(
+  q_frequenzGeschlecht, longtable = TRUE, booktabs = TRUE
+)
+
 q4_bezahlteLinksJoined %>% ggplot(aes(x=ProzentKaufBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q4_bezahlteLinksJoinedAlter <- JoinTableAlter(q4_bezahlteLinks)
+q_frequenzAlter <- getfrequenz1DimensionAlter(q4_bezahlteLinksJoinedAlter,factor(levels2))
+
+
+knitr::kable(
+  q_frequenzAlter, longtable = TRUE, booktabs = TRUE
+)
 
 ```
 
@@ -637,9 +1118,26 @@ knitr::kable(
 
 q5_bezahlteLinksJoined <- JoinTableAlterAndGeschlecht(q5_bezahlteLinksAngepasst)
 
+
+
 q5_bezahlteLinksJoined %>% ggplot(aes(x=ZweckKauf)) + geom_bar(fill=colorSingleBar) + xlab("Zweck") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q5_bezahlteLinksJoinedGeschlecht <- JoinTableGeschlecht(q5_bezahlteLinks)
+q_frequenzGeschlecht <- getfrequenz1DimensionGeschlecht(q5_bezahlteLinksJoinedGeschlecht,factor(levels2))
+
+knitr::kable(
+  q_frequenzGeschlecht, longtable = TRUE, booktabs = TRUE
+)
+
 q5_bezahlteLinksJoined %>% ggplot(aes(x=ZweckKauf)) + geom_bar(fill=colorSingleBar) + xlab("Zweck") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q5_bezahlteLinksJoinedAlter <- JoinTableAlter(q5_bezahlteLinks)
+q_frequenzAlter <- getfrequenz1DimensionAlter(q5_bezahlteLinksJoinedAlter,factor(levels2))
+
+
+knitr::kable(
+  q_frequenzAlter, longtable = TRUE, booktabs = TRUE
+)
 
 ```
 
@@ -651,13 +1149,13 @@ q5_bezahlteLinksJoined %>% ggplot(aes(x=ZweckKauf)) + geom_bar(fill=colorSingleB
 ```{r SocialMediaVerwendung, echo=FALSE}
 
 q6_VewendungSozialMedia <- subset(dat, select=c("Nummer", "X06_1", "X06_2", "X06_3", "X06_4", "X06_5", "X06_6", "X06_7", "X06_8", "X06b"))
-q6_VewendungSozialMedia <-  q6_VewendungSozialMedia %>% rename(Facebook = X06_1, Instagram = X06_2, YouTube = X06_3, Twitter = X06_4 , LinkedIn = X06_5, Spnapchat =X06_6, TikTok =X06_7, Andere =X06_8, AndereText = X06b)
+q6_VewendungSozialMedia <-  q6_VewendungSozialMedia %>% rename(Facebook = X06_1, Instagram = X06_2, YouTube = X06_3, Twitter = X06_4 , LinkedIn = X06_5, Snapchat =X06_6, TikTok =X06_7, Andere =X06_8, AndereText = X06b)
 
 levels2 = c("nie", "selten", "monatlich","wöchentlich","nahezu täglich")
 levels = addNA(c("nie", "selten", "monatlich","wöchentlich","nahezu täglich"))
 q6_VewendungSozialMediaAngepasst <- q6_VewendungSozialMedia %>% subset(select =
                                                                          
-              c(Nummer,Facebook, Instagram, YouTube, Twitter, LinkedIn, Spnapchat, TikTok, Andere)) %>% 
+              c(Nummer,Facebook, Instagram, YouTube, Twitter, LinkedIn, Snapchat, TikTok, Andere)) %>% 
   mutate(
     Facebook = case_when(
       Facebook == 1 ~ levels[1], 
@@ -694,12 +1192,12 @@ q6_VewendungSozialMediaAngepasst <- q6_VewendungSozialMedia %>% subset(select =
       LinkedIn == 4 ~ levels[4],
       LinkedIn == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
-    Spnapchat = case_when(
-      Spnapchat == 1 ~ levels[1], 
-      Spnapchat == 2 ~ levels[2], 
-      Spnapchat == 3 ~ levels[3],
-      Spnapchat == 4 ~ levels[4],
-      Spnapchat == 5 ~ levels[5],
+    Snapchat = case_when(
+      Snapchat == 1 ~ levels[1], 
+      Snapchat == 2 ~ levels[2], 
+      Snapchat == 3 ~ levels[3],
+      Snapchat == 4 ~ levels[4],
+      Snapchat == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
     TikTok = case_when(
       TikTok == 1 ~ levels[1], 
@@ -716,13 +1214,13 @@ q6_VewendungSozialMediaAngepasst <- q6_VewendungSozialMedia %>% subset(select =
       Andere == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels))
 
-q6_VewendungSozialMediaAngepasst <- q6_VewendungSozialMediaAngepasst %>% gather(Facebook, Instagram, YouTube, Twitter, LinkedIn, Spnapchat, TikTok, Andere, key = SocialMedia, value = Frequenz)
+q6_VewendungSozialMediaAngepasst <- q6_VewendungSozialMediaAngepasst %>% gather(Facebook, Instagram, YouTube, Twitter, LinkedIn, Snapchat, TikTok, Andere, key = SocialMedia, value = Frequenz)
 
 q6_VewendungSozialMediaAngepasst <- q6_VewendungSozialMediaAngepasst %>% filter(!is.na(Frequenz))
 
 q6_VewendungSozialMediaAngepasst$SocialMedia <- as.factor(q6_VewendungSozialMediaAngepasst$SocialMedia)
 q6_VewendungSozialMediaAngepasst$Frequenz <- as.factor(q6_VewendungSozialMediaAngepasst$Frequenz)
-q6_VewendungSozialMediaAngepasst$SocialMedia <- factor(q6_VewendungSozialMediaAngepasst$SocialMedia, levels = c("Facebook", "Instagram", "YouTube","Twitter","LinkedIn", "Spnapchat", "TikTok", "Andere"))
+q6_VewendungSozialMediaAngepasst$SocialMedia <- factor(q6_VewendungSozialMediaAngepasst$SocialMedia, levels = c("Facebook", "Instagram", "YouTube","Twitter","LinkedIn", "Snapchat", "TikTok", "Andere"))
 q6_VewendungSozialMediaAngepasst$Frequenz <- factor(q6_VewendungSozialMediaAngepasst$Frequenz, levels = levels2)
 
 q6_VewendungSozialMediaJoined <- JoinTableAlterAndGeschlecht(q6_VewendungSozialMediaAngepasst)
@@ -739,22 +1237,42 @@ knitr::kable(
   AndereTexte, longtable = TRUE, booktabs = TRUE
 )
 
-q6_lageparameter <- getLageparameter(subset(q6_VewendungSozialMedia, select = c(Facebook, Instagram, YouTube, Twitter, LinkedIn, Spnapchat, TikTok, Andere)), levels(q6_VewendungSozialMediaAngepasst$SocialMedia), c(1:8))
+q6_lageparameter <- getLageparameter(subset(q6_VewendungSozialMedia, select = c(Facebook, Instagram, YouTube, Twitter, LinkedIn, Snapchat, TikTok, Andere)), levels(q6_VewendungSozialMediaAngepasst$SocialMedia), c(1:8))
 
 knitr::kable(
   q6_lageparameter, longtable = TRUE, booktabs = TRUE
 )
 
-q6_frequenz <- getfrequenz(subset(q6_VewendungSozialMedia, select = c(Facebook, Instagram, YouTube, Twitter, LinkedIn, Spnapchat, TikTok, Andere)),5,levels(q6_VewendungSozialMediaAngepasst$SocialMedia), levels2, c(1:8), TRUE)
+q6_frequenz <- getfrequenz(subset(q6_VewendungSozialMedia, select = c(Facebook, Instagram, YouTube, Twitter, LinkedIn, Snapchat, TikTok, Andere)),5,levels(q6_VewendungSozialMediaAngepasst$SocialMedia), levels2, c(1:8), TRUE)
 
 knitr::kable(
   q6_frequenz, longtable = TRUE, booktabs = TRUE
 )
 
+
+frequenzfactors <- factor(c("Facebook", "Instagram", "YouTube", "Twitter", "LinkedIn", "Snapchat", "TikTok", "Andere"))
+
 q6_VewendungSozialMediaJoined %>% ggplot(aes(x=Frequenz, fill= SocialMedia)) + geom_bar(position = "dodge2") + xlab("Frequenz") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
-q6_VewendungSozialMediaJoined %>% ggplot(aes(x=Frequenz, fill= SocialMedia)) + geom_bar(position = "dodge2") + xlab("Frequenz") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+q6_VewendungSozialMediaAlter <- JoinTableAlter(q6_VewendungSozialMedia %>% subset(select = -c(AndereText)))
 
+q_frequenzalter<- getfrequenzAlter(q6_VewendungSozialMediaAlter, frequenzfactors, levels2, TRUE)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
+
+
+q6_VewendungSozialMediaJoined %>% ggplot(aes(x=Frequenz, fill= SocialMedia)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+
+q6_VewendungSozialMediaGeschlecht <- JoinTableGeschlecht(q6_VewendungSozialMedia %>% subset(select=-c(AndereText)))
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht(q6_VewendungSozialMediaGeschlecht,frequenzfactors,levels2, TRUE)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
 
 ```
 
@@ -769,7 +1287,7 @@ q7_SucheProduktSozialMedia <- subset(dat, select=c("Nummer", "X07_1", "X07_2"))
 q7_SucheProduktSozialMedia <- q7_SucheProduktSozialMedia %>% rename(privat = X07_1, geschäftlich = X07_2)
 
 levels2 = c("nie", "eher nicht", "vielleicht","ziemlich wahrscheinlich","ganz sicher")
-levels = addNA(c("nie", "eher nicht", "vielleicht","ziemlich wahrscheinlich","ganz sicher"))
+levels = addNA(levels2)
 q7_SucheProduktSozialMediaAngepasst <- q7_SucheProduktSozialMedia %>% subset(select = c(Nummer, privat, geschäftlich)) %>% 
   mutate(
     privat = case_when(
@@ -808,20 +1326,36 @@ knitr::kable(
   q7_lageparameter, longtable = TRUE, booktabs = TRUE
 )
 
-q7_frequenz <- getfrequenz(subset(q7_SucheProduktSozialMedia, select = c(privat, geschäftlich)),5,levels(q7_SucheProduktSozialMediaAngepasst$Art), c(
-  "nie",
-  "eher nicht",
-  "vielleicht", 
-  "ziemlich wahrscheinlich",
-  "ganz sicher"), c(1:2), TRUE)
+q7_frequenz <- getfrequenz(subset(q7_SucheProduktSozialMedia, select = c(privat, geschäftlich)),5,levels(q7_SucheProduktSozialMediaAngepasst$Art),levels2, c(1:2), TRUE)
 
 knitr::kable(
   q7_frequenz, longtable = TRUE, booktabs = TRUE
 )
 
+frequenzfactors <- factor(c("privat", "geschäftlich"))
+
 q7_SucheProduktSozialMediaJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+
+q7_SucheProduktSozialMediaAlterJoined <- JoinTableAlter(q7_SucheProduktSozialMedia)
+
+q_frequenzalter<- getfrequenzAlter(q7_SucheProduktSozialMediaAlterJoined, frequenzfactors, levels2, TRUE)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
+
+
 q7_SucheProduktSozialMediaJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+
+q7_SucheProduktSozialMediaJoinedGeschlecht <- JoinTableGeschlecht(q7_SucheProduktSozialMedia)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht(q7_SucheProduktSozialMediaJoinedGeschlecht,frequenzfactors,levels2, TRUE)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
 
 
 ```
@@ -884,9 +1418,32 @@ knitr::kable(
   q8_frequenz, longtable = TRUE, booktabs = TRUE
 )
 
+
+frequenzfactors <- factor(c("privat", "geschäftlich"))
+
 q8_KommunikationUnternehmenJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q8_KommunikationUnternehmenJoinedAlter <- JoinTableAlter(q8_KommunikationUnternehmen)
+
+q_frequenzalter<- getfrequenzAlter(q8_KommunikationUnternehmenJoinedAlter, frequenzfactors, levels2, TRUE)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
+
+
+
 q8_KommunikationUnternehmenJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+
+q8_KommunikationUnternehmenGeschlecht <- JoinTableGeschlecht(q8_KommunikationUnternehmen)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht(q8_KommunikationUnternehmenGeschlecht,frequenzfactors,levels2, TRUE)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
+
 
 
 ```
@@ -947,9 +1504,28 @@ knitr::kable(
   q9_frequenz, longtable = TRUE, booktabs = TRUE
 )
 
+frequenzfactors <- factor(c("privat", "geschäftlich"))
+
+q9_KommunikationUnternehmenhaufigJoinedAlter <- JoinTableAlter(q9_KommunikationUnternehmenhaufig)
+
 q9_KommunikationUnternehmenhaufigJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q_frequenzalter<- getfrequenzAlter(q9_KommunikationUnternehmenhaufigJoinedAlter, frequenzfactors, levels2, TRUE)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
+
+
 q9_KommunikationUnternehmenhaufigJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q9_KommunikationUnternehmenhaufigGeschlecht <- JoinTableGeschlecht(q9_KommunikationUnternehmenhaufig)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht(q9_KommunikationUnternehmenhaufigGeschlecht,frequenzfactors,levels2, TRUE)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
 
 
 ```
@@ -994,8 +1570,6 @@ q10_UnternehmeneinkaufAngepasst$Frequenz <- as.factor(q10_UnternehmeneinkaufAnge
 q10_UnternehmeneinkaufAngepasst$Art <- factor(q10_UnternehmeneinkaufAngepasst$Art, levels = c("privat", "geschäftlich"))
 q10_UnternehmeneinkaufAngepasst$Frequenz <- factor(q10_UnternehmeneinkaufAngepasst$Frequenz, levels = levels2)
 
-
-
 q10_UnternehmeneinkaufJoined <- JoinTableAlterAndGeschlecht(q10_UnternehmeneinkaufAngepasst)
 
 
@@ -1013,9 +1587,32 @@ knitr::kable(
   q10_frequenz, longtable = TRUE, booktabs = TRUE
 )
 
+
+
+
+frequenzfactors <- factor(c("privat", "geschäftlich"))
+
+q10_UnternehmeneinkaufJoinedAlter <- JoinTableAlter(q10_Unternehmeneinkauf)
+
 q10_UnternehmeneinkaufJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+
+q_frequenzalter<- getfrequenzAlter(q10_UnternehmeneinkaufJoinedAlter, frequenzfactors, levels2, TRUE)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
+
+
 q10_UnternehmeneinkaufJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q10_UnternehmeneinkaufGeschlecht <- JoinTableGeschlecht(q10_Unternehmeneinkauf)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht(q10_UnternehmeneinkaufGeschlecht,frequenzfactors,levels2, TRUE)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
 
 
 ```
@@ -1076,9 +1673,31 @@ knitr::kable(
   q11_frequenz, longtable = TRUE, booktabs = TRUE
 )
 
+
+
+
+
+frequenzfactors <- factor(c("privat", "geschäftlich"))
+
 q11_UnternehmeneinkaufKonkurrenzJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q11_UnternehmeneinkaufKonkurrenzAlter <- JoinTableAlter(q11_UnternehmeneinkaufKonkurrenz)
+
+q_frequenzalter<- getfrequenzAlter(q11_UnternehmeneinkaufKonkurrenzAlter, frequenzfactors, levels2, TRUE)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
+
 q11_UnternehmeneinkaufKonkurrenzJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q11_UnternehmeneinkaufKonkurrenzGeschlecht <- JoinTableGeschlecht(q11_UnternehmeneinkaufKonkurrenz)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht(q11_UnternehmeneinkaufKonkurrenzGeschlecht,frequenzfactors,levels2, TRUE)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
 
 
 ```
@@ -1139,9 +1758,34 @@ knitr::kable(
   q12_frequenz, longtable = TRUE, booktabs = TRUE
 )
 
+
+
+
+
+
+
+frequenzfactors <- factor(c("privat", "geschäftlich"))
+
 q12_likseinkaufJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q12_likseinkaufAlter <- JoinTableAlter(q12_likseinkauf)
+
+q_frequenzalter<- getfrequenzAlter(q12_likseinkaufAlter, frequenzfactors, levels2, TRUE)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
+
+
 q12_likseinkaufJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q12_likseinkaufGeschlecht <- JoinTableGeschlecht(q12_likseinkauf)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht(q12_likseinkaufGeschlecht,frequenzfactors,levels2, TRUE)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
 
 
 ```
@@ -1232,9 +1876,30 @@ knitr::kable(
   q6_frequenz, longtable = TRUE, booktabs = TRUE
 )
 
+
+
+frequenzfactors <- factor(columnNames1)
+
 q13_SucheProduktprivateJoined %>% ggplot(aes(x=Frequenz, fill= Quelle)) + geom_bar(position = "dodge2") + xlab("Quelle") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q13_SucheProduktprivateAlter <- JoinTableAlter(q13_SucheProduktprivate)
+
+q_frequenzalter<- getfrequenzAlter(q13_SucheProduktprivateAlter, frequenzfactors, levels2, TRUE)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
+
+
 q13_SucheProduktprivateJoined %>% ggplot(aes(x=Frequenz, fill= Quelle)) + geom_bar(position = "dodge2") + xlab("Quelle") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q13_SucheProduktprivateGeschlecht <- JoinTableGeschlecht(q13_SucheProduktprivate)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht(q13_SucheProduktprivateGeschlecht,frequenzfactors,levels2, TRUE)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
 
 
 ```
@@ -1321,10 +1986,30 @@ knitr::kable(
   q6_frequenz, longtable = TRUE, booktabs = TRUE
 )
 
+
+
+frequenzfactors <- factor(columnNames1)
+
 q13_SucheProduktfirmJoined %>% ggplot(aes(x=Frequenz, fill= Quelle)) + geom_bar(position = "dodge2") + xlab("Quelle") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
+
+q13_SucheProduktfirmAlter <- JoinTableAlter(q13_SucheProduktfirm)
+
+q_frequenzalter<- getfrequenzAlter(q13_SucheProduktfirmAlter, frequenzfactors, levels2, TRUE)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
+
 
 q13_SucheProduktfirmJoined %>% ggplot(aes(x=Frequenz, fill= Quelle)) + geom_bar(position = "dodge2") + xlab("Quelle") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
 
+q13_SucheProduktfirmGeschlecht <- JoinTableGeschlecht(q13_SucheProduktfirm)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht(q13_SucheProduktfirmGeschlecht,frequenzfactors,levels2, TRUE)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
 
 ```
 
@@ -1341,7 +2026,9 @@ q14_Vertrauen <-  q14_Vertrauen %>% rename(Vergleichsdienste = X14_1, Blogs = X1
 columnNames1 <- c("Vergleichsdienste", "Blogs", "Influencer", "Freunde", "Mitarbeiter", "Webseite", "SocialMedia", "Email")
 
 levels2 = c("nicht vertrauenswürdig", "wenig vertrauenswürdig", "mittelmässig vertrauenswürdig","ziemlich vertrauenswürdig","sehr vertrauenswürdig")
+levels2kurz = c("nicht vertr.", "wenig vertr.", "mittelmässig vertr.","ziemlich vertr.","sehr vertr.")
 levels = addNA(levels2)
+
 q14_VertrauenAngepasst <- q14_Vertrauen %>% subset(select =              c(Nummer,Vergleichsdienste, Blogs, Influencer, Freunde, Mitarbeiter, Webseite, SocialMedia, Email)) %>% 
   mutate(
     Vergleichsdienste = case_when(
@@ -1422,16 +2109,39 @@ knitr::kable(
 )
 
 q_frequenz <- getfrequenz(subset(q14_Vertrauen, select = columnNames1
-),5,levels(q14_VertrauenAngepasst$Quelle), c("nicht vertr.", "wenig vertr.", "mittelmässig vertr.","ziemlich vertr.","sehr vertr."), c(1:8), TRUE)
+),5,levels(q14_VertrauenAngepasst$Quelle), levels2kurz, c(1:8), TRUE)
 
 knitr::kable(
   q_frequenz, longtable = TRUE, booktabs = TRUE
 )
 
+
+
+
+
+
+frequenzfactors <- factor(columnNames1)
+
 q14_VertrauenJoined %>% ggplot(aes(x=Frequenz, fill= Quelle)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
+
+q14_VertrauenAlter <- JoinTableAlter(q14_Vertrauen)
+
+q_frequenzalter<- getfrequenzAlter(q14_VertrauenAlter, frequenzfactors, levels2kurz, TRUE)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
+
 
 q14_VertrauenJoined %>% ggplot(aes(x=Frequenz, fill= Quelle)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
 
+q14_VertrauenGeschlecht <- JoinTableGeschlecht(q14_Vertrauen)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht(q14_VertrauenGeschlecht,frequenzfactors,levels2kurz, TRUE)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
 
 ```
 
@@ -1593,9 +2303,29 @@ knitr::kable(
   caption = "geschäftlich"
 )
 
+
+# frequenzfactors <- factor(columnNames1)
+
 q15_EmailNewsletterJoined %>% ggplot(aes(x=Frequenz, fill= Grund)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+# q15_EmailNewsletterAlter <- JoinTableAlter(q15_EmailNewsletter)
+# 
+# q_frequenzalter<- getfrequenzAlter(q15_EmailNewsletterAlter, frequenzfactors, levels2, TRUE)
+# 
+# knitr::kable(
+#   q_frequenzalter, longtable = TRUE, booktabs = TRUE
+# )
+
+
 q15_EmailNewsletterJoined %>% ggplot(aes(x=Frequenz, fill= Grund)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+# q15_EmailNewsletterGeschlecht <- JoinTableGeschlecht(q15_EmailNewsletter)
+# 
+# q_frequenzgeschlecht <- getfrequenzgeschlecht(q15_EmailNewsletterGeschlecht,frequenzfactors,levels2, TRUE)
+# 
+# knitr::kable(
+#   q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+# )
 
 ```
 
@@ -1648,9 +2378,33 @@ knitr::kable(
   q_frequenz, longtable = TRUE, booktabs = TRUE
 )
 
+
+
+
+
+
+frequenzfactors <- factor(columnNames1)
+
 q16_NichtAbonniertJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q16_NichtAbonniertAlter <- JoinTableAlter(q16_NichtAbonniert)
+
+q_frequenzalter<- getfrequenzAlter(q16_NichtAbonniertAlter, frequenzfactors, levels2, TRUE)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
+
+
 q16_NichtAbonniertJoined %>% ggplot(aes(x=Frequenz, fill= Art)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q16_NichtAbonniertGeschlecht <- JoinTableGeschlecht(q16_NichtAbonniert)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht(q16_NichtAbonniertGeschlecht,frequenzfactors,levels2, TRUE)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
 
 ```
 
@@ -1702,9 +2456,28 @@ knitr::kable(
 q17_BevorzugteKommunikationJoined <- JoinTableAlterAndGeschlecht(q17_BevorzugteKommunikationAngepasst)
 
 
+frequenzfactors <- factor(levels)
+
 q17_BevorzugteKommunikationJoined %>% ggplot(aes(x=Medium)) + geom_bar(fill=colorSingleBar) + xlab("Medium") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q17_BevorzugteKommunikationAlter <- JoinTableAlter(q17_BevorzugteKommunikation)
+
+q_frequenzalter<- getfrequenzAlter(q17_BevorzugteKommunikationAlter, frequenzfactors,  c("Antwortanzahl"), FALSE)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
+
+
 q17_BevorzugteKommunikationJoined %>% ggplot(aes(x=Medium)) + geom_bar(fill=colorSingleBar) + xlab("Medium") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q17_BevorzugteKommunikationGeschlecht <- JoinTableGeschlecht(q17_BevorzugteKommunikation)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht(q17_BevorzugteKommunikationGeschlecht,frequenzfactors, c("Antwortanzahl"), FALSE)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
 
 
 
@@ -1849,9 +2622,33 @@ knitr::kable(
   q_frequenz, longtable = TRUE, booktabs = TRUE
 )
 
+
+
+
+
+
+frequenzfactors <- factor(columnNames1)
+
 q18_QuellenSucheJoined %>% ggplot(aes(x=Frequenz, fill= Quelle)) + geom_bar(position = "dodge2") + xlab("Quelle") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q18_QuellenSucheAlter <- JoinTableAlter(q18_QuellenSuche)
+
+q_frequenzalter<- getfrequenzAlter(q18_QuellenSucheAlter, frequenzfactors, levels2, TRUE)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
+
+
 q18_QuellenSucheJoined %>% ggplot(aes(x=Frequenz, fill= Quelle)) + geom_bar(position = "dodge2") + xlab("Quelle") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q18_QuellenSucheGeschlecht <- JoinTableGeschlecht(q18_QuellenSuche)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht(q18_QuellenSucheGeschlecht,frequenzfactors,levels2, TRUE)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
 
 
 ```
@@ -1943,9 +2740,29 @@ knitr::kable(
   q_frequenz, longtable = TRUE, booktabs = TRUE
 )
 
+
+frequenzfactors <- factor(columnNames1)
+
 q19_QuellenKaufJoined %>% ggplot(aes(x=Frequenz, fill= Quelle)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q19_QuellenKaufAlter <- JoinTableAlter(q19_QuellenKauf)
+
+q_frequenzalter<- getfrequenzAlter(q19_QuellenKaufAlter, frequenzfactors, levels2, TRUE)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
+
+
 q19_QuellenKaufJoined %>% ggplot(aes(x=Frequenz, fill= Quelle)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q19_QuellenKaufGeschlecht <- JoinTableGeschlecht(q19_QuellenKauf)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht(q19_QuellenKaufGeschlecht,frequenzfactors,levels2, TRUE)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
 
 
 ```
@@ -2003,10 +2820,24 @@ knitr::kable(
 
 q20_MediumAktuellJoined <- JoinTableAlterAndGeschlecht(q20_MediumAktuellAngepasst)
 
-
 q20_MediumAktuellJoined %>% ggplot(aes(x=Medium)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q20_MediumAktuellJoinedGeschlecht <- JoinTableGeschlecht(q20_MediumAktuell)
+q_frequenzGeschlecht <- getfrequenz1DimensionGeschlecht(q20_MediumAktuellJoinedGeschlecht,factor(levels2))
+
+knitr::kable(
+  q_frequenzGeschlecht, longtable = TRUE, booktabs = TRUE
+)
+
 q20_MediumAktuellJoined %>% ggplot(aes(x=Medium)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q20_MediumAktuellJoinedAlter <- JoinTableAlter(q20_MediumAktuell)
+q_frequenzAlter <- getfrequenz1DimensionAlter(q20_MediumAktuellJoinedAlter,factor(levels2))
+
+
+knitr::kable(
+  q_frequenzAlter, longtable = TRUE, booktabs = TRUE
+)
 
 ```
 
@@ -2061,9 +2892,25 @@ knitr::kable(
 
 q21_MediumZukunftJoined <- JoinTableAlterAndGeschlecht(q21_MediumZukunftAngepasst)
 
+
 q21_MediumZukunftJoined %>% ggplot(aes(x=Medium)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q21_MediumZukunftJoinedGeschlecht <- JoinTableGeschlecht(q21_MediumZukunft)
+q_frequenzGeschlecht <- getfrequenz1DimensionGeschlecht(q21_MediumZukunftJoinedGeschlecht,factor(levels2))
+
+knitr::kable(
+  q_frequenzGeschlecht, longtable = TRUE, booktabs = TRUE
+)
+
 q21_MediumZukunftJoined %>% ggplot(aes(x=Medium)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q21_MediumZukunftJoinedAlter <- JoinTableAlter(q21_MediumZukunft)
+q_frequenzAlter <- getfrequenz1DimensionAlter(q21_MediumZukunftJoinedAlter,factor(levels2))
+
+
+knitr::kable(
+  q_frequenzAlter, longtable = TRUE, booktabs = TRUE
+)
 
 ```
 
@@ -2109,12 +2956,31 @@ knitr::kable(
   caption = "privat"
 )
 
+
 q22_MediumVorteilJoined <- JoinTableAlterAndGeschlecht(q22_MediumVorteilAngepasst)
+
+frequenzfactors <- factor(levels)
 
 q22_MediumVorteilJoined %>% ggplot(aes(x=Medium)) + geom_bar(fill=colorSingleBar) + xlab("Medium") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
+q22_MediumVorteilAlter <- JoinTableAlter(q22_MediumVorteil)
+
+q_frequenzalter<- getfrequenzAlter(q22_MediumVorteilAlter, frequenzfactors, c("Antwortanzahl"), FALSE)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+)
+
+
 q22_MediumVorteilJoined %>% ggplot(aes(x=Medium)) + geom_bar(fill=colorSingleBar) + xlab("Medium") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
 
+q22_MediumVorteilGeschlecht <- JoinTableGeschlecht(q22_MediumVorteil)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht(q22_MediumVorteilGeschlecht,frequenzfactors,c("Antwortanzahl"), FALSE)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+)
 
 
 ```
