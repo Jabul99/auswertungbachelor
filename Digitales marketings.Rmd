@@ -110,14 +110,11 @@ getfrequenzgeschlecht <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
   numberofColumns <- ncol(x)
   numberoflevels <- nlevels(Rowfactors)
   itemsoflevels <- c(1:numberoflevels)
-  
-  numberoflevels2 <- numberoflevels * 2
-  items <- c(1:numberoflevels2)
-  
+
   numberofColumnNames = length(ColumnNames)
   itemscolums <- c(1: numberofColumnNames)
   
-
+  
   resultDataframe <- data.frame()
   
   rownumber <- 0
@@ -131,8 +128,8 @@ getfrequenzgeschlecht <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
     resultDataframe[rownumber,3] <- c("männlich")
     
     rownumber <- rownumber + 1
-    resultDataframe[rownumber,1] <- nummerforItem
-    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,1] <- NA
+    resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("weiblich")
   }
   
@@ -142,23 +139,23 @@ getfrequenzgeschlecht <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
     Auspraegung = V3)
   
   for(itemNumber in itemscolums){
-  columnname = ColumnNames[itemNumber]
-   if(TotalAnzeigen){
-  resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "0.00% (0)")
-   }
-  else
-   {
+    columnname = ColumnNames[itemNumber]
+    if(TotalAnzeigen){
+      resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "0.00% (0)")
+    }
+    else
+    {
       resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "(0)")
     }
   }
   
-   if(TotalAnzeigen){
+  if(TotalAnzeigen){
     resultDataframe <- resultDataframe %>% mutate(Summe = "(0)")
   }
-
+  
   correctRow <- 1
   for(numberofCurrentColumn in itemsoflevels){
-
+    
     numbers <- transform(as.data.frame(table(x[,numberofCurrentColumn], x$Geschlecht)), 
                          percentagem = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Geschlecht == 1))*100, digits = 2),
                          percentagew = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Geschlecht == 2))*100, digits = 2))
@@ -166,34 +163,35 @@ getfrequenzgeschlecht <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
     numbers$Var1 <- as.numeric(as.character(numbers$Var1))
     numbers$Var2 <- as.numeric(as.character(numbers$Var2))
     
-    numbers<- numbers[order(numbers$Var1,numbers$Var2),]
+    numbersm<- numbers[numbers$Var2 == 1,]
+    numbersw<- numbers[numbers$Var2 == 2,]
     
     summeItemsm <- 0
     summeItemsw <- 0
-    for(val in items)
+    for(val in itemscolums)
     {
-      if(!is.na(numbers[val,1]))
-      {
-        columnnumber <- as.numeric(numbers[val,1]) +3
-        rownumber <- 0
-        if(as.numeric(numbers[val,2]) %% 2 == 0)
-          {
-          rownumber <- correctRow + 1
-          
-          if(TotalAnzeigen){
-          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
-                                                                   paste(as.character(numbers[val,5]),"% ", sep =""), ""),  "(",as.character(numbers[val,3]), ")", sep ="")
-          summeItemsw <- summeItemsw + as.numeric(numbers[val,3])
-          }
-        else
-        { 
-          rownumber <- correctRow
-          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
-                                                                   paste(as.character(numbers[val,4]),"% ", sep =""), ""), "(",as.character(numbers[val,3]), ")", sep ="")
-          summeItemsm <- summeItemsm + as.numeric(numbers[val,3])
-          }
+      columnnumber <- as.numeric(numbers[val,1]) +3
+      
+      if(!is.na(numbersm[val,1]))
+      { 
+        rownumber <- correctRow
+        resultDataframe[rownumber,columnnumber] <-
+        paste(if_else(TotalAnzeigen, 
+                         paste(as.character(numbersm[val,4]),"% ", sep =""), ""),  "(",as.character(numbersm[val,3]), ")", sep ="")
 
+        summeItemsm <- summeItemsm + as.numeric(numbersm[val,3])
       }
+      
+      if(!is.na(numbersw[val,1]))
+      { 
+        rownumber <- correctRow + 1
+        resultDataframe[rownumber,columnnumber] <-
+        paste(if_else(TotalAnzeigen, 
+                      paste(as.character(numbersw[val,5]),"% ", sep =""), ""),  "(",as.character(numbersw[val,3]), ")", sep ="")
+        
+        summeItemsw <- summeItemsw + as.numeric(numbersw[val,3])
+      }
+      
       if(TotalAnzeigen){
         resultDataframe[correctRow,numberofColumnNames +4] <- summeItemsm
         resultDataframe[correctRow+1,numberofColumnNames +4] <- summeItemsw
@@ -201,20 +199,17 @@ getfrequenzgeschlecht <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
     }
     
     correctRow <- correctRow + 2
-  }
-
-  return(resultDataframe)
-  }
+    }
+    
+    return(resultDataframe)
 }
+
 
 
 getfrequenzAlter <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
   numberofColumns <- ncol(x)
   numberoflevels <- nlevels(Rowfactors)
   itemsoflevels <- c(1:numberoflevels)
-  
-  numberoflevels2 <- numberoflevels * 6
-  items <- c(1:numberoflevels2)
   
   numberofColumnNames = length(ColumnNames)
   itemscolums <- c(1: numberofColumnNames)
@@ -233,28 +228,28 @@ getfrequenzAlter <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
     resultDataframe[rownumber,3] <- c("18-25")
     
     rownumber <- rownumber + 1
-    resultDataframe[rownumber,1] <- nummerforItem
-    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,1] <- NA
+    resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("26-32")
     
     rownumber <- rownumber + 1
-    resultDataframe[rownumber,1] <- nummerforItem
-    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,1] <- NA
+    resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("33-40")
     
     rownumber <- rownumber + 1
-    resultDataframe[rownumber,1] <- nummerforItem
-    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,1] <- NA
+    resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("41-55")
     
     rownumber <- rownumber + 1
-    resultDataframe[rownumber,1] <- nummerforItem
-    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,1] <- NA
+    resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("56-65")
     
     rownumber <- rownumber + 1
-    resultDataframe[rownumber,1] <- nummerforItem
-    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,1] <- NA
+    resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("über 65")
   }
   
@@ -267,7 +262,7 @@ getfrequenzAlter <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
     columnname = ColumnNames[itemNumber]
     
     if(TotalAnzeigen){
-    resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "0.00% (0)")
+      resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "0.00% (0)")
     }
     else{
       resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "(0)")
@@ -283,72 +278,81 @@ getfrequenzAlter <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
     numbers <- transform(as.data.frame(table(x[,numberofCurrentColumn], x$Alter)), 
                          percentage18 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 2))*100, digits = 2),
                          percentage26 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 3))*100, digits = 2),
-    percentage33 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 4))*100, digits = 2),
-    percentage41 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 5))*100, digits = 2),
-    percentage55 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 6))*100, digits = 2),
-    percentage65 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 7))*100, digits = 2))
-
+                         percentage33 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 4))*100, digits = 2),
+                         percentage41 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 5))*100, digits = 2),
+                         percentage55 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 6))*100, digits = 2),
+                         percentage65 = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Alter == 7))*100, digits = 2))
+    
     numbers$Var1 <- as.numeric(as.character(numbers$Var1))
     numbers$Var2 <- as.numeric(as.character(numbers$Var2))
     
-    numbers<- numbers[order(numbers$Var1,numbers$Var2),]
+    numbers18<- numbers[numbers$Var2 == 2,]
+    numbers26<- numbers[numbers$Var2 == 3,]
+    numbers33<- numbers[numbers$Var2 == 4,]
+    numbers41<- numbers[numbers$Var2 == 5,]
+    numbers55<- numbers[numbers$Var2 == 6,]
+    numbers65<- numbers[numbers$Var2 == 7,]
     
     summeItems18 <- 0
     summeItems26 <- 0
     summeItems33 <- 0
     summeItems41 <- 0
-    summeItems56 <- 0
+    summeItems55 <- 0
     summeItems65 <- 0
-    for(val in items)
+    for(val in itemscolums)
     {
       if(!is.na(numbers[val,1]))
       {
         columnnumber <- as.numeric(numbers[val,1]) +3
         rownumber <- 0
-        if(as.numeric(numbers[val,2]) == 7 )
+        
+        if(!is.na(numbers18[val,1]) & !is.na(numbers18[val,3]))
+        { 
+          rownumber <- correctRow
+          resultDataframe[rownumber,columnnumber] <-paste(if_else(TotalAnzeigen, 
+                                                                  paste(as.character(numbers18[val,4]),"% ", sep =""), ""), "(",as.character(numbers18[val,3]), ")", sep ="")
+          summeItems18 <- summeItems18 + as.numeric(numbers18[val,3])
+        }
+
+        if(!is.na(numbers26[val,1]) & !is.na(numbers26[val,3]))
+        {
+          rownumber <- correctRow + 1
+          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
+                                                                   paste(as.character(numbers26[val,5]),"% ", sep =""), ""), "(",as.character(numbers26[val,3]), ")", sep ="")
+          summeItems26 <- summeItems26 + as.numeric(numbers26[val,3])
+        }
+        
+        if(!is.na(numbers33[val,1]) & !is.na(numbers33[val,3]))
+        {
+          rownumber <- correctRow + 2
+          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
+                                                                   paste(as.character(numbers33[val,6]),"% ", sep =""), ""), "(",as.character(numbers33[val,3]), ")", sep ="")
+          summeItems33 <- summeItems33 + as.numeric(numbers33[val,3])
+        }
+        
+        if(!is.na(numbers41[val,1]) & !is.na(numbers41[val,3]))
+        {
+          rownumber <- correctRow + 3
+          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
+                                                                   paste(as.character(numbers41[val,7]),"% ", sep =""), ""), "(",as.character(numbers41[val,3]), ")", sep ="")
+          summeItems41 <- summeItems41 + as.numeric(numbers41[val,3])
+        }
+        
+        if(!is.na(numbers55[val,1]) & !is.na(numbers55[val,3]))
+        {
+          rownumber <- correctRow + 4
+          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
+                                                                   paste(as.character(numbers55[val,8]),"% ", sep =""), ""), "(",as.character(numbers55[val,3]), ")", sep ="")
+          summeItems55 <- summeItems55 + as.numeric(numbers55[val,3])
+        }
+        
+        if(!is.na(numbers65[val,1]) & !is.na(numbers65[val,3]))
         {
           rownumber <- correctRow + 5
           resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
-                                                                   paste(as.character(numbers[val,9]),"% ", sep =""), ""), "(",as.character(numbers[val,3]), ")", sep ="")
-          summeItems65 <- summeItems65 + as.numeric(numbers[val,3])
+                                                                   paste(as.character(numbers65[val,9]),"% ", sep =""), ""), "(",as.character(numbers65[val,3]), ")", sep ="")
+          summeItems65 <- summeItems65 + as.numeric(numbers65[val,3])
         }
-        else if(as.numeric(numbers[val,2]) == 6)
-        { 
-          rownumber <- correctRow + 4
-          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
-                                                                   paste(as.character(numbers[val,8]),"% ", sep =""), ""), "(",as.character(numbers[val,3]), ")", sep ="")
-          summeItems56 <- summeItems56 + as.numeric(numbers[val,3])
-        }
-        else if(as.numeric(numbers[val,2]) == 5)
-        { 
-          rownumber <- correctRow + 3
-          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
-                                                                   paste(as.character(numbers[val,7]),"% ", sep =""), ""), "(",as.character(numbers[val,3]), ")", sep ="")
-          summeItems41 <- summeItems41 + as.numeric(numbers[val,3])
-        }
-        else if(as.numeric(numbers[val,2]) == 4)
-        { 
-          rownumber <- correctRow + 2
-          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
-                                                                   paste(as.character(numbers[val,6]),"% ", sep =""), ""), "(",as.character(numbers[val,3]), ")", sep ="")
-          summeItems33 <- summeItems33 + as.numeric(numbers[val,3])
-        }
-        else if(as.numeric(numbers[val,2]) == 3)
-        { 
-          rownumber <- correctRow + 1
-          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
-                                                                   paste(as.character(numbers[val,5]),"% ", sep =""), ""), "(",as.character(numbers[val,3]), ")", sep ="")
-          summeItems26 <- summeItems26 + as.numeric(numbers[val,3])
-        }
-        else if(as.numeric(numbers[val,2]) == 2)
-        { 
-          rownumber <- correctRow
-          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
-                                                                   paste(as.character(numbers[val,4]),"% ", sep =""), ""), "(",as.character(numbers[val,3]), ")", sep ="")
-          summeItems18 <- summeItems18 + as.numeric(numbers[val,3])
-        }
-        
-        
         
       }
       if(TotalAnzeigen){
@@ -356,7 +360,7 @@ getfrequenzAlter <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
         resultDataframe[correctRow+1,numberofColumnNames +4] <- summeItems26
         resultDataframe[correctRow+2,numberofColumnNames +4] <- summeItems33
         resultDataframe[correctRow+3,numberofColumnNames +4] <- summeItems41
-        resultDataframe[correctRow+4,numberofColumnNames +4] <- summeItems56
+        resultDataframe[correctRow+4,numberofColumnNames +4] <- summeItems55
         resultDataframe[correctRow+5,numberofColumnNames +4] <- summeItems65
       }
     }
@@ -420,8 +424,8 @@ getfrequenz1DimensionGeschlecht <- function(x, Rowfactors){
     resultDataframe[rownumber,3] <- c("männlich")
     
     rownumber <- rownumber + 1
-    resultDataframe[rownumber,1] <- nummerforItem
-    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,1] <- NA
+    resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("weiblich")
   }
   
@@ -471,10 +475,12 @@ getfrequenz1DimensionGeschlecht <- function(x, Rowfactors){
     }
 
   resultDataframe[correctRow,1] <- c("Total")
+  resultDataframe[correctRow,3] <- c("männlich")
     resultDataframe[correctRow,4] <- paste("(",summeItemsm, ")", sep ="")
     
     correctRow <- correctRow + 1
     resultDataframe[correctRow,1] <- c("Total")
+     resultDataframe[correctRow,3] <- c("weiblich")
     resultDataframe[correctRow,4] <- paste("(",summeItemsw, ")", sep ="")
 
   
@@ -504,28 +510,28 @@ getfrequenz1DimensionAlter <- function(x, Rowfactors){
     resultDataframe[rownumber,3] <- c("18-25")
     
     rownumber <- rownumber + 1
-    resultDataframe[rownumber,1] <- nummerforItem
-    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,1] <- NA
+    resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("26-32")
     
     rownumber <- rownumber + 1
-    resultDataframe[rownumber,1] <- nummerforItem
-    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,1] <- NA
+    resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("33-40")
     
     rownumber <- rownumber + 1
-    resultDataframe[rownumber,1] <- nummerforItem
-    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,1] <- NA
+    resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("41-55")
     
     rownumber <- rownumber + 1
-    resultDataframe[rownumber,1] <- nummerforItem
-    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,1] <- NA
+    resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("56-65")
     
     rownumber <- rownumber + 1
-    resultDataframe[rownumber,1] <- nummerforItem
-    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,1] <- NA
+    resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("über 65")
   }
   
@@ -567,42 +573,42 @@ getfrequenz1DimensionAlter <- function(x, Rowfactors){
   {
     columnnumber <- 4
     
-    if(!is.na(numbers18[val,1]))
+    if(!is.na(numbers18[val,1]) & !is.na(numbers18[val,3]))
     { 
       rownumber <- correctRow
       resultDataframe[rownumber,columnnumber] <-paste(as.character(numbers18[val,4]),"% ", "(",as.character(numbers18[val,3]), ")", sep ="")
       summeItems18 <- summeItems18 + as.numeric(numbers18[val,3])
     }
     
-    if(!is.na(numbers26[val,1]))
+    if(!is.na(numbers26[val,1]) & !is.na(numbers26[val,3]))
     {
       rownumber <- correctRow + 1
       resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers26[val,5]),"% ", "(",as.character(numbers26[val,3]), ")", sep ="")
       summeItems26 <- summeItems26 + as.numeric(numbers26[val,3])
     }
     
-    if(!is.na(numbers33[val,1]))
+    if(!is.na(numbers33[val,1]) & !is.na(numbers33[val,3]))
     {
       rownumber <- correctRow + 2
       resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers33[val,6]),"% ", "(",as.character(numbers33[val,3]), ")", sep ="")
       summeItems33 <- summeItems33 + as.numeric(numbers33[val,3])
     }
     
-    if(!is.na(numbers41[val,1]))
+    if(!is.na(numbers41[val,1]) & !is.na(numbers41[val,3]))
     {
       rownumber <- correctRow + 3
       resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers41[val,7]),"% ", "(",as.character(numbers41[val,3]), ")", sep ="")
       summeItems41 <- summeItems41 + as.numeric(numbers41[val,3])
     }
     
-    if(!is.na(numbers55[val,1]))
+    if(!is.na(numbers55[val,1]) & !is.na(numbers55[val,3]))
     {
       rownumber <- correctRow + 4
       resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers55[val,8]),"% ", "(",as.character(numbers55[val,3]), ")", sep ="")
       summeItems55 <- summeItems55 + as.numeric(numbers55[val,3])
     }
     
-    if(!is.na(numbers65[val,1]))
+    if(!is.na(numbers65[val,1]) & !is.na(numbers65[val,3]))
     {
       rownumber <- correctRow + 5
       resultDataframe[rownumber,columnnumber] <- paste(as.character(numbers65[val,9]),"% ", "(",as.character(numbers65[val,3]), ")", sep ="")
@@ -614,26 +620,32 @@ getfrequenz1DimensionAlter <- function(x, Rowfactors){
   }
   
   resultDataframe[correctRow,1] <- c("Total")
+  resultDataframe[correctRow,3] <- c("18-25")
   resultDataframe[correctRow,4] <- paste("(",summeItems18, ")", sep ="")
   
   correctRow <- correctRow + 1
   resultDataframe[correctRow,1] <- c("Total")
+    resultDataframe[correctRow,3] <- c("26-32")
   resultDataframe[correctRow,4] <- paste("(",summeItems26, ")", sep ="")
   
   correctRow <- correctRow + 1
   resultDataframe[correctRow,1] <- c("Total")
+    resultDataframe[correctRow,3] <-  c("33-40")
   resultDataframe[correctRow,4] <- paste("(",summeItems33, ")", sep ="")
   
   correctRow <- correctRow + 1
   resultDataframe[correctRow,1] <- c("Total")
+    resultDataframe[correctRow,3] <- c("41-55")
   resultDataframe[correctRow,4] <- paste("(",summeItems41, ")", sep ="")
   
   correctRow <- correctRow + 1
   resultDataframe[correctRow,1] <- c("Total")
+    resultDataframe[correctRow,3] <- c("56-65")
   resultDataframe[correctRow,4] <- paste("(",summeItems55, ")", sep ="")
   
   correctRow <- correctRow + 1
   resultDataframe[correctRow,1] <- c("Total")
+    resultDataframe[correctRow,3] <- c("über 65")
   resultDataframe[correctRow,4] <- paste("(",summeItems65, ")", sep ="")
   
   return(resultDataframe)
@@ -891,7 +903,7 @@ knitr::kable(
 
 ```
 
-# Zeite Seite der Resultatseite
+# Zweite Seite der Resultatseite
 
 ## 02 - In wie vielen Prozent der Fälle schauen Sie sich bei der Suche nach Informationendie zweite Resultatseite an?
 ```{r ZweiteSeite, echo=FALSE}
@@ -932,15 +944,6 @@ q2_bezahlteLinksJoined <- JoinTableAlterAndGeschlecht(q2_bezahlteLinksAngepasst)
 
 q2_bezahlteLinksJoined %>% ggplot(aes(x=ZweiteSeite)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
-q2_bezahlteLinksJoinedGeschlecht <- JoinTableGeschlecht(q2_bezahlteLinks)
-q_frequenzGeschlecht <- getfrequenz1DimensionGeschlecht(q2_bezahlteLinksJoinedGeschlecht,factor(levels2))
-
-knitr::kable(
-  q_frequenzGeschlecht, longtable = TRUE, booktabs = TRUE
-)
-
-
-q2_bezahlteLinksJoined %>% ggplot(aes(x=ZweiteSeite)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
 
 q2_bezahlteLinksJoinedAlter <- JoinTableAlter(q2_bezahlteLinks)
 q_frequenzAlter <- getfrequenz1DimensionAlter(q2_bezahlteLinksJoinedAlter,factor(levels2))
@@ -949,6 +952,17 @@ q_frequenzAlter <- getfrequenz1DimensionAlter(q2_bezahlteLinksJoinedAlter,factor
 knitr::kable(
   q_frequenzAlter, longtable = TRUE, booktabs = TRUE
 )
+
+q2_bezahlteLinksJoined %>% ggplot(aes(x=ZweiteSeite)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+
+q2_bezahlteLinksJoinedGeschlecht <- JoinTableGeschlecht(q2_bezahlteLinks)
+q_frequenzGeschlecht <- getfrequenz1DimensionGeschlecht(q2_bezahlteLinksJoinedGeschlecht,factor(levels2))
+
+knitr::kable(
+  q_frequenzGeschlecht, longtable = TRUE, booktabs = TRUE
+)
+
 
 ```
 
@@ -995,14 +1009,6 @@ q3_bezahlteLinksJoined <- JoinTableAlterAndGeschlecht(q3_bezahlteLinksAngepasst)
 
 q3_bezahlteLinksJoined %>% ggplot(aes(x=ProzentBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
-q3_bezahlteLinksJoinedGeschlecht <- JoinTableGeschlecht(q3_bezahlteLinks)
-q_frequenzGeschlecht <- getfrequenz1DimensionGeschlecht(q3_bezahlteLinksJoinedGeschlecht,factor(levels2))
-
-knitr::kable(
-  q_frequenzGeschlecht, longtable = TRUE, booktabs = TRUE
-)
-
-q3_bezahlteLinksJoined %>% ggplot(aes(x=ProzentBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
 
 q3_bezahlteLinksJoinedAlter <- JoinTableAlter(q3_bezahlteLinks)
 q_frequenzAlter <- getfrequenz1DimensionAlter(q3_bezahlteLinksJoinedAlter,factor(levels2))
@@ -1011,6 +1017,17 @@ q_frequenzAlter <- getfrequenz1DimensionAlter(q3_bezahlteLinksJoinedAlter,factor
 knitr::kable(
   q_frequenzAlter, longtable = TRUE, booktabs = TRUE
 )
+
+q3_bezahlteLinksJoined %>% ggplot(aes(x=ProzentBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+
+q3_bezahlteLinksJoinedGeschlecht <- JoinTableGeschlecht(q3_bezahlteLinks)
+q_frequenzGeschlecht <- getfrequenz1DimensionGeschlecht(q3_bezahlteLinksJoinedGeschlecht,factor(levels2))
+
+knitr::kable(
+  q_frequenzGeschlecht, longtable = TRUE, booktabs = TRUE
+)
+
 
 ```
 
@@ -1059,14 +1076,6 @@ q4_bezahlteLinksJoined <- JoinTableAlterAndGeschlecht(q4_bezahlteLinksAngepasst)
 
 q4_bezahlteLinksJoined %>% ggplot(aes(x=ProzentKaufBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
-q4_bezahlteLinksJoinedGeschlecht <- JoinTableGeschlecht(q4_bezahlteLinks)
-q_frequenzGeschlecht <- getfrequenz1DimensionGeschlecht(q4_bezahlteLinksJoinedGeschlecht,factor(levels2))
-
-knitr::kable(
-  q_frequenzGeschlecht, longtable = TRUE, booktabs = TRUE
-)
-
-q4_bezahlteLinksJoined %>% ggplot(aes(x=ProzentKaufBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
 
 q4_bezahlteLinksJoinedAlter <- JoinTableAlter(q4_bezahlteLinks)
 q_frequenzAlter <- getfrequenz1DimensionAlter(q4_bezahlteLinksJoinedAlter,factor(levels2))
@@ -1075,6 +1084,16 @@ q_frequenzAlter <- getfrequenz1DimensionAlter(q4_bezahlteLinksJoinedAlter,factor
 knitr::kable(
   q_frequenzAlter, longtable = TRUE, booktabs = TRUE
 )
+
+q4_bezahlteLinksJoined %>% ggplot(aes(x=ProzentKaufBezahlteLinks)) + geom_bar(fill=colorSingleBar) + xlab("Prozent") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+q4_bezahlteLinksJoinedGeschlecht <- JoinTableGeschlecht(q4_bezahlteLinks)
+q_frequenzGeschlecht <- getfrequenz1DimensionGeschlecht(q4_bezahlteLinksJoinedGeschlecht,factor(levels2))
+
+knitr::kable(
+  q_frequenzGeschlecht, longtable = TRUE, booktabs = TRUE
+)
+
 
 ```
 
@@ -1122,21 +1141,22 @@ q5_bezahlteLinksJoined <- JoinTableAlterAndGeschlecht(q5_bezahlteLinksAngepasst)
 
 q5_bezahlteLinksJoined %>% ggplot(aes(x=ZweckKauf)) + geom_bar(fill=colorSingleBar) + xlab("Zweck") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
-q5_bezahlteLinksJoinedGeschlecht <- JoinTableGeschlecht(q5_bezahlteLinks)
-q_frequenzGeschlecht <- getfrequenz1DimensionGeschlecht(q5_bezahlteLinksJoinedGeschlecht,factor(levels2))
-
-knitr::kable(
-  q_frequenzGeschlecht, longtable = TRUE, booktabs = TRUE
-)
-
-q5_bezahlteLinksJoined %>% ggplot(aes(x=ZweckKauf)) + geom_bar(fill=colorSingleBar) + xlab("Zweck") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
-
 q5_bezahlteLinksJoinedAlter <- JoinTableAlter(q5_bezahlteLinks)
 q_frequenzAlter <- getfrequenz1DimensionAlter(q5_bezahlteLinksJoinedAlter,factor(levels2))
 
 
 knitr::kable(
   q_frequenzAlter, longtable = TRUE, booktabs = TRUE
+)
+
+q5_bezahlteLinksJoined %>% ggplot(aes(x=ZweckKauf)) + geom_bar(fill=colorSingleBar) + xlab("Zweck") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+
+
+q5_bezahlteLinksJoinedGeschlecht <- JoinTableGeschlecht(q5_bezahlteLinks)
+q_frequenzGeschlecht <- getfrequenz1DimensionGeschlecht(q5_bezahlteLinksJoinedGeschlecht,factor(levels2))
+
+knitr::kable(
+  q_frequenzGeschlecht, longtable = TRUE, booktabs = TRUE
 )
 
 ```
@@ -1361,7 +1381,7 @@ knitr::kable(
 ```
 
 
-# Kommunikation mit Unternehmungen über Social Media
+# Kommunikation mit Unternehmen über Social Media
 
 ## 08 - Kommunizieren Sie mit Unternehmen über Social Media Kanäle?
 
@@ -1532,7 +1552,7 @@ knitr::kable(
 
 
 
-# Kauf über Social Media von Unternehmen mit welchen man kommuniziert
+# Kauf über Social Media von Unternehmen, mit welchen man kommuniziert
 
 ## 10 - Kaufen Sie Ihre Produkte oder Dienstleistungen bei dem Unternehmen ein, mit dem Sie über Social Media kommunizieren?
 
@@ -1620,7 +1640,7 @@ knitr::kable(
 
 
 
-# Kauf der Angeboten bei der Konkurrenz
+# Kauf von Angeboten bei der Konkurrenz
 
 ## 11 - Kaufen Sie diese Produkte oder Dienstleistungen auch bei der Konkurrenz ein?
 
@@ -1705,7 +1725,7 @@ knitr::kable(
 
 
 
-# Einfluss von Liks auf den Einkauf
+# Einfluss von Likes auf den Einkauf
 
 ## 12 - Wie häufig wird Ihre Kaufentscheidung durch Likes von Bekannten und Freunden beeinflusst?
 
@@ -1794,7 +1814,7 @@ knitr::kable(
 
 # Verwendete Quellen für die Suche nach Angeboten
 
-## 13 - Auf welche Quellen greifen Sie bei Ihrer Suche nach neuen Produkten oder Dienstleistungen zurück... - privat
+## 13 - Auf welche Quellen greifen Sie bei Ihrer Suche nach neuen Produkten oder Dienstleistungen zurück und wie oft? - privat
 
 ```{r VerwendungQuellenprivat, echo=FALSE}
 
@@ -1904,7 +1924,7 @@ knitr::kable(
 
 ```
 
-## 13 - Auf welche Quellen greifen Sie bei Ihrer Suche nach neuen Produkten oder Dienstleistungen zurück... - geschäftlich
+## 13 - Auf welche Quellen greifen Sie bei Ihrer Suche nach neuen Produkten oder Dienstleistungen zurück und wie oft?- geschäftlich
 
 ```{r VerwendungQuellengeschäftlich, echo=FALSE}
 
@@ -2014,9 +2034,9 @@ knitr::kable(
 ```
 
 
-# Vertrauensürdigkeit von Quellen
+# Vertrauenswürdigkeit der Quellen
 
-## 14 - Wie vertrauenswürdig stufen Sie nachfolgende Quellen ein,wenn Sie neue Produkte oder Dienstleistungen suchen?
+## 14 - Wie vertrauenswürdig stufen Sie nachfolgende Quellen ein, wenn Sie neue Produkte oder Dienstleistungen suchen?
 
 ```{r VertrauenQuellen, echo=FALSE}
 
@@ -2146,7 +2166,7 @@ knitr::kable(
 ```
 
 
-# Gründe Email_Newsletter
+# Gründe für Email-Newsletter Anmeldung
 
 ## 15 - Aus welchen Gründen melden Sie sich für einen Email-Newsletter an?
 
@@ -2330,7 +2350,7 @@ q15_EmailNewsletterJoined %>% ggplot(aes(x=Frequenz, fill= Grund)) + geom_bar(po
 ```
 
 
-# Einkauf aufgrund eines nicht abonnierten Emails
+# Einkauf aufgrund eines nicht abonnierten Email-Newsletter
 
 ## 16 - Haben Sie schon jemals ein Produkt oder eine Dienstleistung eingekauft, welche von einem nicht abonnierten Email-Newsletter kam?
 
@@ -2410,7 +2430,7 @@ knitr::kable(
 
 # Bevorzugte Kommunikationsart
 
-## 17 - Welche Kommunikationsarten bevorzugen Sie zwischen Ihnen und einem Unternehmen?(maximal 4)
+## 17 - Welche Kommunikationsarten bevorzugen Sie zwischen Ihnen und einem Unternehmen? (maximal 4)
 ```{r BevorzugteKommunikation, echo=FALSE}
 
 q17_BevorzugteKommunikation <- subset(dat, select=c("Nummer", "X17_1", "X17_2", "X17_3", "X17_4","X17_5", "X17_6","X17_7", "X17_8","X17_9", "X17_10","X17_10_TEXT"))
@@ -2484,9 +2504,9 @@ knitr::kable(
 ```
 
 
-# Quellen verwendung um Angebote zu suchen
+# Verwendete Quellen, um Angebote zu suchen
 
-## 18 - Wie häufig verwenden Sie die folgenden Quellen,um neue Produkte oder Dienstleistungen zu suchen?
+## 18 - Wie häufig verwenden Sie die folgenden Quellen, um neue Produkte oder Dienstleistungen zu suchen?
 
 ```{r QuellenVerwendeHaeufigAngebot, echo=FALSE}
 
@@ -2770,7 +2790,7 @@ knitr::kable(
 
 # Medien
 
-## 20 - Welches Medium verwenden Sie aktuell,wenn Sie sich über neue Produkte oder Dienstleistungen informieren?
+## 20 - Welches Medium verwenden Sie aktuell, wenn Sie sich über neue Produkte oder Dienstleistungen informieren?
 
 ```{r Medien1, echo=FALSE}
 
