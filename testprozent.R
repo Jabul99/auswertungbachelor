@@ -87,8 +87,10 @@ getfrequenz <- function(x, NumberOfItems, RowNamesLevels, ColumnNames, itemNumbe
   
   for(numberofCurrentColumn in itemscolums){
     
-    numbers <- transform(as.data.frame(table(x[numberofCurrentColumn])), percentage = round(Freq/nrow(x)*100, digits = 2))
+    numbers <- transform(as.data.frame(table(x[numberofCurrentColumn])), percentage = round(Freq/nrow(x[numberofCurrentColumn] %>% filter( !is.na(x[numberofCurrentColumn])))*100, digits = 2))
     numbers$Var1 <- as.numeric(as.character(numbers$Var1))
+    
+    
     
     summeItems <- 0
     for(val in items)
@@ -112,8 +114,87 @@ getfrequenz <- function(x, NumberOfItems, RowNamesLevels, ColumnNames, itemNumbe
   return(resultDataframe)
 }
 
+getfrequenzgeschlecht15 <- function(x, Rowfactors, ColumnNames){
+  numberofColumns <- ncol(x)
+  numberoflevels <- nlevels(Rowfactors)
+  itemsoflevels <- c(1:numberoflevels)
+  
+  numberofColumnNames = length(ColumnNames)
+  itemscolums <- c(1: numberofColumnNames)
+  
+  
+  resultDataframe <- data.frame()
+  
+  rownumber <- 0
+  nummerforItem <- 0
+  for(itemNumber in itemsoflevels){
+    rownumber <- rownumber + 1
+    nummerforItem <- nummerforItem +1
+    
+    resultDataframe[rownumber,1] <- nummerforItem
+    resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
+    resultDataframe[rownumber,3] <- c("männlich")
+    resultDataframe[rownumber,4] <- c("(0)")
+    
+    rownumber <- rownumber + 1
+    resultDataframe[rownumber,1] <- NA
+    resultDataframe[rownumber,2] <- NA
+    resultDataframe[rownumber,3] <- c("weiblich")
+    resultDataframe[rownumber,4] <- c("(0)")
+  }
+  
+  resultDataframe <- resultDataframe %>% rename(
+    Nr = V1,
+    Feld = V2,
+    Auspraegung = V3,
+    Antwortanzahl =V4)
 
-getfrequenzAlter <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
+  correctRow <- 1
+  for(numberofCurrentColumn in itemsoflevels){
+    
+    numbers <- transform(as.data.frame(table(x[,numberofCurrentColumn], x$Geschlecht)), 
+                         percentagem = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Geschlecht == 1))*100, digits = 2),
+                         percentagew = round(Freq/length(which(!is.na(x[,numberofCurrentColumn]) & x$Geschlecht == 2))*100, digits = 2))
+    
+    numbers$Var1 <- as.numeric(as.character(numbers$Var1))
+    numbers$Var2 <- as.numeric(as.character(numbers$Var2))
+    
+    numbersm<- numbers[numbers$Var2 == 1,]
+    numbersw<- numbers[numbers$Var2 == 2,]
+    
+    summeItemsm <- 0
+    summeItemsw <- 0
+    for(val in itemscolums)
+    {
+      columnnumber <- as.numeric(numbers[val,1]) +3
+      
+      if(!is.na(numbersm[val,1]))
+      { 
+        rownumber <- correctRow
+        resultDataframe[rownumber,columnnumber] <-
+          paste("(",as.character(numbersm[val,3]), ")", sep ="")
+        
+        summeItemsm <- summeItemsm + as.numeric(numbersm[val,3])
+      }
+      
+      if(!is.na(numbersw[val,1]))
+      { 
+        rownumber <- correctRow + 1
+        resultDataframe[rownumber,columnnumber] <-
+          paste("(",as.character(numbersw[val,3]), ")", sep ="")
+        
+        summeItemsw <- summeItemsw + as.numeric(numbersw[val,3])
+      }
+     
+    }
+    
+    correctRow <- correctRow + 2
+  }
+  
+  return(resultDataframe)
+}
+
+getfrequenzAlter15 <- function(x, Rowfactors, ColumnNames){
   numberofColumns <- ncol(x)
   numberoflevels <- nlevels(Rowfactors)
   itemsoflevels <- c(1:numberoflevels)
@@ -133,55 +214,46 @@ getfrequenzAlter <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
     resultDataframe[rownumber,1] <- nummerforItem
     resultDataframe[rownumber,2] <- Rowfactors[itemNumber]
     resultDataframe[rownumber,3] <- c("18-25")
+    resultDataframe[rownumber,4] <- c("(0)")
     
     rownumber <- rownumber + 1
     resultDataframe[rownumber,1] <- NA
     resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("26-32")
+    resultDataframe[rownumber,4] <- c("(0)")
     
     rownumber <- rownumber + 1
     resultDataframe[rownumber,1] <- NA
     resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("33-40")
+    resultDataframe[rownumber,4] <- c("(0)")
     
     rownumber <- rownumber + 1
     resultDataframe[rownumber,1] <- NA
     resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("41-55")
+    resultDataframe[rownumber,4] <- c("(0)")
     
     rownumber <- rownumber + 1
     resultDataframe[rownumber,1] <- NA
     resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("56-65")
+    resultDataframe[rownumber,4] <- c("(0)")
     
     rownumber <- rownumber + 1
     resultDataframe[rownumber,1] <- NA
     resultDataframe[rownumber,2] <- NA
     resultDataframe[rownumber,3] <- c("über 65")
+    resultDataframe[rownumber,4] <- c("(0)")
   }
   
   resultDataframe <- resultDataframe %>% rename(
     Nr = V1,
     Feld = V2,
-    Auspraegung = V3)
+    Auspraegung = V3, 
+    Antwortanzahl = V4)
   
-  for(itemNumber in itemscolums){
-    columnname = ColumnNames[itemNumber]
-    
-    if(TotalAnzeigen){
-      resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "0.00% (0)")
-    }
-    else{
-      resultDataframe <- resultDataframe %>% mutate(UQ(rlang::sym(columnname)) := "(0)")
-    }
-  }
-  if(TotalAnzeigen){
-    resultDataframe <- resultDataframe %>% mutate(Summe = "0")
-  }
-  
-  correctRow <- 1
-  checkRowNumber <- 1
-  RowadditionCount <- 6
+   correctRow <- 1
   for(numberofCurrentColumn in itemsoflevels){
     
     numbers <- transform(as.data.frame(table(x[,numberofCurrentColumn], x$Alter)), 
@@ -217,69 +289,56 @@ getfrequenzAlter <- function(x, Rowfactors, ColumnNames, TotalAnzeigen){
         
         if(!is.na(numbers18[val,1]) & !is.na(numbers18[val,3]))
         { 
-          rrownumber <- getRowNumber(correctRow, checkRowNumber, numbers18[val,1], RowadditionCount)
-          resultDataframe[rownumber,columnnumber] <-paste(if_else(TotalAnzeigen, 
-                                                                  paste(as.character(numbers18[val,4]),"% ", sep =""), ""), "(",as.character(numbers18[val,3]), ")", sep ="")
+          rownumber <- correctRow
+          resultDataframe[rownumber,columnnumber] <-paste("(",as.character(numbers18[val,3]), ")", sep ="")
           summeItems18 <- summeItems18 + as.numeric(numbers18[val,3])
         }
         
         if(!is.na(numbers26[val,1]) & !is.na(numbers26[val,3]))
         {
-          rownumber <- getRowNumber(correctRow, checkRowNumber, numbers26[val,1], RowadditionCount)+ 1
-          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
-                                                                   paste(as.character(numbers26[val,5]),"% ", sep =""), ""), "(",as.character(numbers26[val,3]), ")", sep ="")
+          rownumber <- correctRow + 1
+          resultDataframe[rownumber,columnnumber] <- paste("(",as.character(numbers26[val,3]), ")", sep ="")
           summeItems26 <- summeItems26 + as.numeric(numbers26[val,3])
         }
         
         if(!is.na(numbers33[val,1]) & !is.na(numbers33[val,3]))
         {
-          rownumber <- getRowNumber(correctRow, checkRowNumber, numbers33[val,1], RowadditionCount)+ 2
-          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
-                                                                   paste(as.character(numbers33[val,6]),"% ", sep =""), ""), "(",as.character(numbers33[val,3]), ")", sep ="")
+          rownumber <- correctRow + 2
+          resultDataframe[rownumber,columnnumber] <- paste("(",as.character(numbers33[val,3]), ")", sep ="")
           summeItems33 <- summeItems33 + as.numeric(numbers33[val,3])
         }
         
         if(!is.na(numbers41[val,1]) & !is.na(numbers41[val,3]))
         {
-          rownumber <- getRowNumber(correctRow, checkRowNumber, numbers41[val,1], RowadditionCount) + 3
-          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
-                                                                   paste(as.character(numbers41[val,7]),"% ", sep =""), ""), "(",as.character(numbers41[val,3]), ")", sep ="")
+          rownumber <- correctRow + 3
+          resultDataframe[rownumber,columnnumber] <- paste("(",as.character(numbers41[val,3]), ")", sep ="")
           summeItems41 <- summeItems41 + as.numeric(numbers41[val,3])
         }
         
         if(!is.na(numbers55[val,1]) & !is.na(numbers55[val,3]))
         {
-          rownumber <- getRowNumber(correctRow, checkRowNumber, numbers55[val,1], RowadditionCount)+ 4
-          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
-                                                                   paste(as.character(numbers55[val,8]),"% ", sep =""), ""), "(",as.character(numbers55[val,3]), ")", sep ="")
+          rownumber <- correctRow + 4
+          resultDataframe[rownumber,columnnumber] <- paste("(",as.character(numbers55[val,3]), ")", sep ="")
           summeItems55 <- summeItems55 + as.numeric(numbers55[val,3])
         }
         
         if(!is.na(numbers65[val,1]) & !is.na(numbers65[val,3]))
         {
-          rownumber <- getRowNumber(correctRow, checkRowNumber, numbers65[val,1], RowadditionCount) + 5
-          resultDataframe[rownumber,columnnumber] <- paste(if_else(TotalAnzeigen, 
-                                                                   paste(as.character(numbers65[val,9]),"% ", sep =""), ""), "(",as.character(numbers65[val,3]), ")", sep ="")
+          rownumber <- correctRow + 5
+          resultDataframe[rownumber,columnnumber] <- paste("(",as.character(numbers65[val,3]), ")", sep ="")
           summeItems65 <- summeItems65 + as.numeric(numbers65[val,3])
         }
         
       }
-      if(TotalAnzeigen){
-        resultDataframe[correctRow,numberofColumnNames +4] <- summeItems18
-        resultDataframe[correctRow+1,numberofColumnNames +4] <- summeItems26
-        resultDataframe[correctRow+2,numberofColumnNames +4] <- summeItems33
-        resultDataframe[correctRow+3,numberofColumnNames +4] <- summeItems41
-        resultDataframe[correctRow+4,numberofColumnNames +4] <- summeItems55
-        resultDataframe[correctRow+5,numberofColumnNames +4] <- summeItems65
-      }
     }
     
     correctRow <- correctRow + 6
-    checkRowNumber <- checkRowNumber + 1
   }
   
   return(resultDataframe)
 }
+  
+  
 
 getfrequenz1Dimension <- function(x, NumberOfItems, RowNamesLevels, itemNumbers){
   items <- c(1:NumberOfItems)
@@ -565,6 +624,7 @@ getfrequenz1DimensionAlter <- function(x, Rowfactors){
   
   return(resultDataframe)
 }
+
 
 JoinTableAlterAndGeschlecht <- function(x){
   newtable <- left_join(x,q23_Geschlecht, by = "Nummer")
@@ -1005,90 +1065,193 @@ q23_Geschlecht <- q23_Geschlecht %>% filter(!is.na(GeschlechtText))
 
 
 
+q15_EmailNewsletterprivat <- subset(dat, select=c("Nummer", "X15_1_1", "X15_2_1","X15_3_1", "X15_4_1", "X15_5_1", "X15_6_1"))
+q15_EmailNewsletterprivat <- q15_EmailNewsletterprivat  %>% rename(Intresse = X15_1_1, Aktionen = X15_2_1,
+                                                                   Angebot = X15_3_1, Inhalt = X15_4_1, Trends = X15_5_1, Unternehmen = X15_6_1)
+
+q15_EmailNewsletterfirm <- subset(dat, select=c("Nummer", "X15_1_2", "X15_2_2","X15_3_2", "X15_4_2", "X15_5_2", "X15_6_2"))
+q15_EmailNewsletterfirm <- q15_EmailNewsletterfirm  %>% rename(Intresse = X15_1_2, Aktionen = X15_2_2,
+                                                               Angebot = X15_3_2, Inhalt = X15_4_2, Trends = X15_5_2, Unternehmen = X15_6_2)
+
+columnNames1 <- c("Intresse", "Aktionen", "Angebot", "Inhalt", "Trends", "Unternehmen")
+levels2 = c("Interesse an einem Produkt / einer Dienstleistung", "Information über Aktionen", "Infromationen über neue Angebote","Inhalt der Informationen","Informationen über neue Trends", "Informationen über das unternehmen")
+levels = addNA(levels2)
+q15_EmailNewsletterprivatAngepasst <- q15_EmailNewsletterprivat %>% subset(select = columnNames1) %>% 
+  mutate(
+    Intresse = case_when(
+      Intresse == 1 ~ levels[1], 
+      Intresse == 2 ~ levels[2], 
+      Intresse == 3 ~ levels[3],
+      Intresse == 4 ~ levels[4],
+      Intresse == 5 ~ levels[5],
+      Intresse == 6 ~ levels[6],
+      TRUE ~  levels[7]) %>% factor(levels),
+    Angebot = case_when(
+      Angebot == 1 ~ levels[1], 
+      Angebot == 2 ~ levels[2], 
+      Angebot == 3 ~ levels[3],
+      Angebot == 4 ~ levels[4],
+      Angebot == 5 ~ levels[5],
+      Angebot == 6 ~ levels[6],
+      TRUE ~  levels[7]) %>% factor(levels),
+    Inhalt = case_when(
+      Inhalt == 1 ~ levels[1], 
+      Inhalt == 2 ~ levels[2], 
+      Inhalt == 3 ~ levels[3],
+      Inhalt == 4 ~ levels[4],
+      Inhalt == 5 ~ levels[5],
+      Inhalt == 6 ~ levels[6],
+      TRUE ~  levels[7]) %>% factor(levels),
+    Trends = case_when(
+      Trends == 1 ~ levels[1], 
+      Trends == 2 ~ levels[2], 
+      Trends == 3 ~ levels[3],
+      Trends == 4 ~ levels[4],
+      Trends == 5 ~ levels[5],
+      Trends == 6 ~ levels[6],
+      TRUE ~  levels[7]) %>% factor(levels),
+    Unternehmen = case_when(
+      Unternehmen == 1 ~ levels[1], 
+      Unternehmen == 2 ~ levels[2], 
+      Unternehmen == 3 ~ levels[3],
+      Unternehmen == 4 ~ levels[4],
+      Unternehmen == 5 ~ levels[5],
+      Unternehmen == 6 ~ levels[6],
+      TRUE ~  levels[7]) %>% factor(levels),
+    Aktionen = case_when(
+      Aktionen == 1 ~ levels[1], 
+      Aktionen == 2 ~ levels[2], 
+      Aktionen == 3 ~ levels[3],
+      Aktionen == 4 ~ levels[4],
+      Aktionen == 5 ~ levels[5],
+      Aktionen == 6 ~ levels[6],
+      TRUE ~  levels[7]) %>% factor(levels))
+
+q15_EmailNewsletterfirmAngepasst <- q15_EmailNewsletterfirm %>% subset(select = c(Nummer, Intresse, Aktionen, Angebot, Inhalt, Trends, Unternehmen)) %>% 
+  mutate(
+    Intresse = case_when(
+      Intresse == 1 ~ levels[1], 
+      Intresse == 2 ~ levels[2], 
+      Intresse == 3 ~ levels[3],
+      Intresse == 4 ~ levels[4],
+      Intresse == 5 ~ levels[5],
+      Intresse == 6 ~ levels[6],
+      TRUE ~  levels[7]) %>% factor(levels),
+    Angebot = case_when(
+      Angebot == 1 ~ levels[1], 
+      Angebot == 2 ~ levels[2], 
+      Angebot == 3 ~ levels[3],
+      Angebot == 4 ~ levels[4],
+      Angebot == 5 ~ levels[5],
+      Angebot == 6 ~ levels[6],
+      TRUE ~  levels[7]) %>% factor(levels),
+    Inhalt = case_when(
+      Inhalt == 1 ~ levels[1], 
+      Inhalt == 2 ~ levels[2], 
+      Inhalt == 3 ~ levels[3],
+      Inhalt == 4 ~ levels[4],
+      Inhalt == 5 ~ levels[5],
+      Inhalt == 6 ~ levels[6],
+      TRUE ~  levels[7]) %>% factor(levels),
+    Trends = case_when(
+      Trends == 1 ~ levels[1], 
+      Trends == 2 ~ levels[2], 
+      Trends == 3 ~ levels[3],
+      Trends == 4 ~ levels[4],
+      Trends == 5 ~ levels[5],
+      Trends == 6 ~ levels[6],
+      TRUE ~  levels[7]) %>% factor(levels),
+    Unternehmen = case_when(
+      Unternehmen == 1 ~ levels[1], 
+      Unternehmen == 2 ~ levels[2], 
+      Unternehmen == 3 ~ levels[3],
+      Unternehmen == 4 ~ levels[4],
+      Unternehmen == 5 ~ levels[5],
+      Unternehmen == 6 ~ levels[6],
+      TRUE ~  levels[7]) %>% factor(levels),
+    Aktionen = case_when(
+      Aktionen == 1 ~ levels[1], 
+      Aktionen == 2 ~ levels[2], 
+      Aktionen == 3 ~ levels[3],
+      Aktionen == 4 ~ levels[4],
+      Aktionen == 5 ~ levels[5],
+      Aktionen == 6 ~ levels[6],
+      TRUE ~  levels[7]) %>% factor(levels))
 
 
+q15_EmailNewsletterprivatAngepasst <- q15_EmailNewsletterprivat %>% gather(Intresse, Aktionen, Angebot, Inhalt, Trends, Unternehmen, key = Grund, value = Frequenz)
 
+q15_EmailNewsletterprivatAngepasst <- q15_EmailNewsletterprivatAngepasst %>% filter(!is.na(Frequenz))
 
+q15_EmailNewsletterprivatAngepasst <- q15_EmailNewsletterprivatAngepasst %>% mutate(Frequenz = "privat")
 
+q15_EmailNewsletterfirmAngepasst <- q15_EmailNewsletterfirm %>% gather(Intresse, Aktionen, Angebot, Inhalt, Trends, Unternehmen, key = Grund, value = Frequenz)
 
+q15_EmailNewsletterfirmAngepasst <- q15_EmailNewsletterfirmAngepasst %>% filter(!is.na(Frequenz))
+q15_EmailNewsletterfirmAngepasst <- q15_EmailNewsletterfirmAngepasst %>% mutate(Frequenz = "geschäftlich")
 
-q17_BevorzugteKommunikation <- subset(dat, select=c("Nummer", "X17_1", "X17_2", "X17_3", "X17_4","X17_5", "X17_6","X17_7", "X17_8","X17_9", "X17_10","X17_10_TEXT"))
-q17_BevorzugteKommunikation <- q17_BevorzugteKommunikation  %>% rename(Email = X17_1, Brief = X17_2,
-                                                                       MobileApp = X17_3, SocialMedia = X17_4,
-                                                                       Messanger = X17_5, SMS = X17_6,
-                                                                       Telefon = X17_7, Chatbots = X17_8,
-                                                                       ServiceProtale = X17_9, Andere = X17_10,
-                                                                       AndereText = X17_10_TEXT)
+q15_EmailNewsletterprivatAngepasst$Grund <- as.factor(q15_EmailNewsletterprivatAngepasst$Grund)
+q15_EmailNewsletterfirmAngepasst$Grund <- as.factor(q15_EmailNewsletterfirmAngepasst$Grund)
+q15_EmailNewsletterprivatAngepasst$Grund <- factor(q15_EmailNewsletterprivatAngepasst$Grund, levels = columnNames1)
+q15_EmailNewsletterfirmAngepasst$Grund <- factor(q15_EmailNewsletterfirmAngepasst$Grund, levels = columnNames1)
 
+q15_EmailNewsletter <- rbind(q15_EmailNewsletterprivatAngepasst,q15_EmailNewsletterfirmAngepasst)
+q15_EmailNewsletter$Frequenz <- as.factor(q15_EmailNewsletter$Frequenz)
 
-q17_BevorzugteKommunikationAngepasst <- q17_BevorzugteKommunikation %>% gather(Email, Brief, MobileApp, SocialMedia, Messanger,SMS, Telefon, Chatbots, ServiceProtale, Andere, key = Medium, value = Frequenz)
+q15_EmailNewsletterJoined <- JoinTableAlterAndGeschlecht(q15_EmailNewsletter)
 
-levels = c("Email", "Brief", "MobileApp", "SocialMedia", "Messanger", "SMS", "Telefon", "Chatbots", "ServiceProtale", "Andere")
+q15_EmailNewsletter %>% ggplot(aes(x=Frequenz, fill= Grund)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + coord_flip()
 
-q17_BevorzugteKommunikationAngepasst$Medium <- as.factor(q17_BevorzugteKommunikationAngepasst$Medium )
-q17_BevorzugteKommunikationAngepasst$Medium  <- factor(q17_BevorzugteKommunikationAngepasst$Medium, levels = levels)
-
-q17_BevorzugteKommunikationAngepasst <- q17_BevorzugteKommunikationAngepasst %>% filter(!is.na(Frequenz))
-q17_BevorzugteKommunikationAngepasst$Frequenz <- as.factor(q17_BevorzugteKommunikationAngepasst$Frequenz )
-
-
-q17_BevorzugteKommunikationAngepasst %>% ggplot(aes(x=Medium)) + geom_bar(fill=colorSingleBar) + xlab("Medium") + ylab("Anzahl") + coord_flip()
-
-q17_BevorzugteKommunikationText <-  q17_BevorzugteKommunikation %>% subset(select = c(AndereText))
-q17_BevorzugteKommunikationText$AndereText <- str_trim(q17_BevorzugteKommunikationText$AndereText)
-
-q17_BevorzugteKommunikationText <-  q17_BevorzugteKommunikationText %>% filter(q17_BevorzugteKommunikationText$AndereText != "")
-AndereTexte <- data.frame(Andere = q17_BevorzugteKommunikationText)
-
-knitr::kable(
-  AndereTexte, longtable = TRUE, booktabs = TRUE
-)
-
-q_frequenz <- getfrequenz(subset(q17_BevorzugteKommunikation, select = levels),1,levels(q17_BevorzugteKommunikationAngepasst$Medium), c("Antwortanzahl"), c(1:10), FALSE)
+q_frequenz <- getfrequenz(subset(q15_EmailNewsletterprivat, select = columnNames1),1,levels(q15_EmailNewsletterprivatAngepasst$Grund), c("Email-Newsletter"), c(1:6), TRUE)
 
 knitr::kable(
   q_frequenz, longtable = TRUE, booktabs = TRUE,
   caption = "privat"
 )
 
-
-q17_BevorzugteKommunikationJoined <- JoinTableAlterAndGeschlecht(q17_BevorzugteKommunikationAngepasst)
-
-
-frequenzfactors <- factor(levels)
-
-q17_BevorzugteKommunikationJoined %>% ggplot(aes(x=Medium)) + geom_bar(fill=colorSingleBar) + xlab("Medium") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
-
-q17_BevorzugteKommunikationAlter <- JoinTableAlter(q17_BevorzugteKommunikation)
-
-q_lageparameterAlter <- getLageparameterAlter(q17_BevorzugteKommunikationAlter %>% subset(select = -c(AndereText)), frequenzfactors)
+q_frequenz <- getfrequenz(subset(q15_EmailNewsletterfirm, select = columnNames1),1,levels(q15_EmailNewsletterfirmAngepasst$Grund), c("Email-Newsletter"), c(1:6), TRUE)
 
 knitr::kable(
-  q_lageparameterAlter, longtable = TRUE, booktabs = TRUE
-)
-
-q_frequenzalter<- getfrequenzAlter(q17_BevorzugteKommunikationAlter, frequenzfactors,  c("Antwortanzahl"), FALSE)
-
-knitr::kable(
-  q_frequenzalter, longtable = TRUE, booktabs = TRUE
+  q_frequenz, longtable = TRUE, booktabs = TRUE,
+  caption = "geschäftlich"
 )
 
 
-q17_BevorzugteKommunikationJoined %>% ggplot(aes(x=Medium)) + geom_bar(fill=colorSingleBar) + xlab("Medium") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
+frequenzfactors <- factor(columnNames1, levels = columnNames1)
 
-q17_BevorzugteKommunikationGeschlecht <- JoinTableGeschlecht(q17_BevorzugteKommunikation)
+q15_EmailNewsletterJoined %>% ggplot(aes(x=Frequenz, fill= Grund)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~AlterText, nrow=3, ncol = 2, scales = "free", dir = "h")  + coord_flip()
 
-q_lageparameterGeschlecht <- getLageparameterGeschlecht (q17_BevorzugteKommunikationGeschlecht %>% subset(select = -c(AndereText)), frequenzfactors)
+q15_EmailNewsletterAlter <- JoinTableAlter(q15_EmailNewsletterprivat)
+
+q_frequenzalter<- getfrequenzAlter15(q15_EmailNewsletterAlter, frequenzfactors, columnNames1)
 
 knitr::kable(
-  q_lageparameterGeschlecht, longtable = TRUE, booktabs = TRUE
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE, caption = "private"
+)
+
+q15_EmailNewsletterAlter2 <- JoinTableAlter(q15_EmailNewsletterfirm)
+
+q_frequenzalter<- getfrequenzAlter15(q15_EmailNewsletterAlter2, frequenzfactors, columnNames1)
+
+knitr::kable(
+  q_frequenzalter, longtable = TRUE, booktabs = TRUE, caption = "geschäftlich"
 )
 
 
+q15_EmailNewsletterJoined %>% ggplot(aes(x=Frequenz, fill= Grund)) + geom_bar(position = "dodge2") + xlab("") + ylab("Anzahl") + facet_wrap(.~GeschlechtText)  + coord_flip()
 
-q_frequenzgeschlecht <- getfrequenzgeschlecht(q17_BevorzugteKommunikationGeschlecht,frequenzfactors, c("Antwortanzahl"), FALSE)
+q15_EmailNewsletterGeschlecht <- JoinTableGeschlecht(q15_EmailNewsletterprivat)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht15(q15_EmailNewsletterGeschlecht,frequenzfactors,levels2)
 
 knitr::kable(
-  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE, caption = "private"
 )
 
+q15_EmailNewsletterGeschlecht2 <- JoinTableGeschlecht(q15_EmailNewsletterfirm)
+
+q_frequenzgeschlecht <- getfrequenzgeschlecht15(q15_EmailNewsletterGeschlecht2,frequenzfactors,levels2)
+
+knitr::kable(
+  q_frequenzgeschlecht, longtable = TRUE, booktabs = TRUE , caption = "geschäftlich"
+)
