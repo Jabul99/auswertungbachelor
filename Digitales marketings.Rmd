@@ -6,7 +6,6 @@ output: pdf_document
 ---
 
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -1399,7 +1398,7 @@ q24_AlterJoined %>% ggplot(aes(x=AlterText)) + geom_bar(fill=colorSingleBar) + x
 ```
 
 
-# Suchmaschienenpreferenzen
+# Suchmaschienenpräferenzen
 
 ## 01 - Welche Suchmaschinen verwenden Sie für die Suche nach Informationen und wie oft?
 
