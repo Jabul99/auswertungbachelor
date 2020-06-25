@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r load-packages, include=FALSE}
 library(plyr)
+library(psych)
 library(dplyr)
 library(tidyverse)
 library(magrittr)
@@ -1398,7 +1399,7 @@ q24_AlterJoined %>% ggplot(aes(x=AlterText)) + geom_bar(fill=colorSingleBar) + x
 ```
 
 
-# Suchmaschienenpräferenzen
+# Suchmaschinenpräferenzen
 
 ## 01 - Welche Suchmaschinen verwenden Sie für die Suche nach Informationen und wie oft?
 
@@ -3953,3 +3954,42 @@ knitr::kable(
 
 ```
 
+# Reliability (Verlässlichkeit)
+```{r Relaiability, echo=FALSE, warning= FALSE, message= FALSE}
+
+q1_Suchmaschine <-  subset(dat, select=-c(X01b, X06b, X17_10_TEXT, X18b, X20_5_TEXT, X21_5_TEXT, X22_5_TEXT, X15_1_1, X15_1_2, X15_2_1, X15_2_2, X15_3_1, X15_3_2, X15_4_1, X15_4_2, X15_5_1, X15_5_2, X15_6_1, X15_6_2,X17_1, X17_2, X17_3, X17_4, X17_5, X17_6, X17_7, X17_8, X17_9, X17_10,X22_1, X22_2, X22_3, X22_4, X22_5))
+
+result <- splitHalf(q1_Suchmaschine)
+
+datasetsplithalf <- data.frame()
+
+datasetsplithalf[1,1] <- c("Maximum Guttman's lambda 4")
+datasetsplithalf[1,2] <- round(result$maxrb, digits = 2)
+
+datasetsplithalf[2,1] <- c("Guttman's lambda 6")
+datasetsplithalf[2,2] <- round(result$lambda6, digits = 2)
+
+datasetsplithalf[3,1] <- c("Durchschnitts split half Reliability")
+datasetsplithalf[3,2] <- round(result$meanr, digits = 2)
+
+datasetsplithalf[4,1] <- c("Guttman lambda 3 (alpha)")
+datasetsplithalf[4,2] <- round(result$alpha, digits = 2)
+
+
+datasetsplithalf[5,1] <- c("Guttman lambda 2 ")
+datasetsplithalf[5,2] <- round(result$lambda2, digits = 2)
+
+datasetsplithalf[6,1] <- c("Minimum split half reliability (beta) ")
+datasetsplithalf[6,2] <- round(result$minrb, digits = 2)
+
+
+
+datasetsplithalf <- datasetsplithalf %>% rename(
+  Variante = V1,
+  Wert = V2)
+
+knitr::kable(
+  datasetsplithalf, longtable = TRUE, booktabs = TRUE , caption = "Split Half Alpha"
+)
+
+```

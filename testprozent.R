@@ -1,4 +1,6 @@
 library(plyr)
+
+library(psych)
 library(dplyr)
 library(tidyverse)
 library(magrittr)
@@ -1066,6 +1068,8 @@ q23_Geschlecht <- q23_Geschlecht %>% filter(!is.na(GeschlechtText))
 
 
 q15_EmailNewsletterprivat <- subset(dat, select=c("Nummer", "X15_1_1", "X15_2_1","X15_3_1", "X15_4_1", "X15_5_1", "X15_6_1"))
+
+alpha(q15_EmailNewsletterprivat, check.keys = TRUE, na.rm = TRUE)
 q15_EmailNewsletterprivat <- q15_EmailNewsletterprivat  %>% rename(Intresse = X15_1_1, Aktionen = X15_2_1,
                                                                    Angebot = X15_3_1, Inhalt = X15_4_1, Trends = X15_5_1, Unternehmen = X15_6_1)
 
