@@ -30,7 +30,7 @@ colorWoman <- #c74dc2"
 colorGenderNot <- #85796f
 colorsGender <- c("#0703f0","#c74dc2", "#85796f")  
 
-dat <- read.csv2('D:\\Desktop\\BIT\\Bachelor\\06_Auswertung\\Angepasste Tabelle.csv')
+dat <- read.csv2('./Daten.csv')
 
 q24_Alter <- subset(dat, select=c("Nummer", "X24"))
 q24_Alter <- q24_Alter %>% rename(Alter = X24)
