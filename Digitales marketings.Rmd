@@ -2630,14 +2630,14 @@ knitr::kable(
 ```{r VerwendungQuellenprivat, echo=FALSE}
 
 q13_SucheProduktprivate <- subset(dat, select=c("Nummer", "X13.1_1", "X13.1_2", "X13.1_3", "X13.1_4", "X13.1_5", "X13.1_6"))
-q13_SucheProduktprivate <- q13_SucheProduktprivate %>% rename(Vergleichsdienste = X13.1_1, Blogs = X13.1_2, Influencer = X13.1_3, Freunde = X13.1_4, Mitarbeiter = X13.1_5, SocialMedia = X13.1_6 )
+q13_SucheProduktprivate <- q13_SucheProduktprivate %>% rename(Vergleichsdienste = X13.1_1, Blogs = X13.1_2, InfluencerIn = X13.1_3, Freunde = X13.1_4, Arbeitnehmende = X13.1_5, SocialMedia = X13.1_6 )
 
-columnNames1 <- c("Vergleichsdienste", "Blogs", "Influencer", "Freunde", "Mitarbeiter", "SocialMedia")
+columnNames1 <- c("Vergleichsdienste", "Blogs", "InfluencerIn", "Freunde", "Arbeitnehmende", "SocialMedia")
 
 levels2Angabe = c("nie(1)", "selten(2)", "gelegentlich(3)","oft(4)","immer(5)")
 levels2 = c("nie", "selten", "gelegentlich","oft","immer")
 levels = addNA(levels2)
-q13_SucheProduktprivateAngepasst <- q13_SucheProduktprivate %>% subset(select =              c(Nummer,Vergleichsdienste, Blogs, Influencer, Freunde, Mitarbeiter, SocialMedia)) %>% 
+q13_SucheProduktprivateAngepasst <- q13_SucheProduktprivate %>% subset(select =              c(Nummer,Vergleichsdienste, Blogs, InfluencerIn, Freunde, Arbeitnehmende, SocialMedia)) %>% 
   mutate(
     Vergleichsdienste = case_when(
       Vergleichsdienste == 1 ~ levels[1], 
@@ -2653,12 +2653,12 @@ q13_SucheProduktprivateAngepasst <- q13_SucheProduktprivate %>% subset(select = 
       Blogs == 4 ~ levels[4],
       Blogs == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
-    Influencer = case_when(
-      Influencer == 1 ~ levels[1], 
-      Influencer == 2 ~ levels[2], 
-      Influencer == 3 ~ levels[3],
-      Influencer == 4 ~ levels[4],
-      Influencer == 5 ~ levels[5],
+    InfluencerIn = case_when(
+      InfluencerIn == 1 ~ levels[1], 
+      InfluencerIn == 2 ~ levels[2], 
+      InfluencerIn == 3 ~ levels[3],
+      InfluencerIn == 4 ~ levels[4],
+      InfluencerIn == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
     Freunde = case_when(
       Freunde == 1 ~ levels[1], 
@@ -2667,12 +2667,12 @@ q13_SucheProduktprivateAngepasst <- q13_SucheProduktprivate %>% subset(select = 
       Freunde == 4 ~ levels[4],
       Freunde == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
-    Mitarbeiter = case_when(
-      Mitarbeiter == 1 ~ levels[1], 
-      Mitarbeiter == 2 ~ levels[2], 
-      Mitarbeiter == 3 ~ levels[3],
-      Mitarbeiter == 4 ~ levels[4],
-      Mitarbeiter == 5 ~ levels[5],
+    Arbeitnehmende = case_when(
+      Arbeitnehmende == 1 ~ levels[1], 
+      Arbeitnehmende == 2 ~ levels[2], 
+      Arbeitnehmende == 3 ~ levels[3],
+      Arbeitnehmende == 4 ~ levels[4],
+      Arbeitnehmende == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
     SocialMedia = case_when(
       SocialMedia == 1 ~ levels[1], 
@@ -2682,7 +2682,7 @@ q13_SucheProduktprivateAngepasst <- q13_SucheProduktprivate %>% subset(select = 
       SocialMedia == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels))
 
-q13_SucheProduktprivateAngepasst <- q13_SucheProduktprivateAngepasst %>% gather(Vergleichsdienste, Blogs, Influencer, Freunde, Mitarbeiter, SocialMedia, key = Quelle, value = Frequenz)
+q13_SucheProduktprivateAngepasst <- q13_SucheProduktprivateAngepasst %>% gather(Vergleichsdienste, Blogs, InfluencerIn, Freunde, Arbeitnehmende, SocialMedia, key = Quelle, value = Frequenz)
 
 q13_SucheProduktprivateAngepasst <- q13_SucheProduktprivateAngepasst %>% filter(!is.na(Frequenz))
 
@@ -2754,14 +2754,14 @@ knitr::kable(
 ```{r VerwendungQuellengeschäftlich, echo=FALSE}
 
 q13_SucheProduktfirm <- subset(dat, select=c("Nummer", "X13.2_1", "X13.2_2", "X13.2_3", "X13.2_4", "X13.2_5", "X13.2_6"))
-q13_SucheProduktfirm <- q13_SucheProduktfirm %>% rename(Vergleichsdienste = X13.2_1, Blogs = X13.2_2, Influencer = X13.2_3, Freunde = X13.2_4, Mitarbeiter = X13.2_5, SocialMedia = X13.2_6 )
+q13_SucheProduktfirm <- q13_SucheProduktfirm %>% rename(Vergleichsdienste = X13.2_1, Blogs = X13.2_2, InfluencerIn = X13.2_3, Freunde = X13.2_4, Arbeitnehmende = X13.2_5, SocialMedia = X13.2_6 )
 
-columnNames1 <- c("Vergleichsdienste", "Blogs", "Influencer", "Freunde", "Mitarbeiter", "SocialMedia")
+columnNames1 <- c("Vergleichsdienste", "Blogs", "InfluencerIn", "Freunde", "Arbeitnehmende", "SocialMedia")
 
 levels2Angabe = c("nie(1)", "selten(2)", "gelegentlich(3)","oft(4)","immer(5)")
 levels2 = c("nie", "selten", "gelegentlich","oft","immer")
 levels = addNA(levels2)
-q13_SucheProduktfirmAngepasst <- q13_SucheProduktfirm %>% subset(select =              c(Nummer,Vergleichsdienste, Blogs, Influencer, Freunde, Mitarbeiter, SocialMedia)) %>% 
+q13_SucheProduktfirmAngepasst <- q13_SucheProduktfirm %>% subset(select =              c(Nummer,Vergleichsdienste, Blogs, InfluencerIn, Freunde, Arbeitnehmende, SocialMedia)) %>% 
   mutate(
     Vergleichsdienste = case_when(
       Vergleichsdienste == 1 ~ levels[1], 
@@ -2777,12 +2777,12 @@ q13_SucheProduktfirmAngepasst <- q13_SucheProduktfirm %>% subset(select =       
       Blogs == 4 ~ levels[4],
       Blogs == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
-    Influencer = case_when(
-      Influencer == 1 ~ levels[1], 
-      Influencer == 2 ~ levels[2], 
-      Influencer == 3 ~ levels[3],
-      Influencer == 4 ~ levels[4],
-      Influencer == 5 ~ levels[5],
+    InfluencerIn = case_when(
+      InfluencerIn == 1 ~ levels[1], 
+      InfluencerIn == 2 ~ levels[2], 
+      InfluencerIn == 3 ~ levels[3],
+      InfluencerIn == 4 ~ levels[4],
+      InfluencerIn == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
     Freunde = case_when(
       Freunde == 1 ~ levels[1], 
@@ -2791,12 +2791,12 @@ q13_SucheProduktfirmAngepasst <- q13_SucheProduktfirm %>% subset(select =       
       Freunde == 4 ~ levels[4],
       Freunde == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
-    Mitarbeiter = case_when(
-      Mitarbeiter == 1 ~ levels[1], 
-      Mitarbeiter == 2 ~ levels[2], 
-      Mitarbeiter == 3 ~ levels[3],
-      Mitarbeiter == 4 ~ levels[4],
-      Mitarbeiter == 5 ~ levels[5],
+    Arbeitnehmende = case_when(
+      Arbeitnehmende == 1 ~ levels[1], 
+      Arbeitnehmende == 2 ~ levels[2], 
+      Arbeitnehmende == 3 ~ levels[3],
+      Arbeitnehmende == 4 ~ levels[4],
+      Arbeitnehmende == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
     SocialMedia = case_when(
       SocialMedia == 1 ~ levels[1], 
@@ -2806,7 +2806,7 @@ q13_SucheProduktfirmAngepasst <- q13_SucheProduktfirm %>% subset(select =       
       SocialMedia == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels))
 
-q13_SucheProduktfirmAngepasst <- q13_SucheProduktfirmAngepasst %>% gather(Vergleichsdienste, Blogs, Influencer, Freunde, Mitarbeiter, SocialMedia, key = Quelle, value = Frequenz)
+q13_SucheProduktfirmAngepasst <- q13_SucheProduktfirmAngepasst %>% gather(Vergleichsdienste, Blogs, InfluencerIn, Freunde, Arbeitnehmende, SocialMedia, key = Quelle, value = Frequenz)
 
 q13_SucheProduktfirmAngepasst <- q13_SucheProduktfirmAngepasst %>% filter(!is.na(Frequenz))
 
@@ -2882,9 +2882,9 @@ knitr::kable(
 ```{r VertrauenQuellen, echo=FALSE}
 
 q14_Vertrauen <- subset(dat, select=c("Nummer", "X14_1", "X14_2", "X14_3", "X14_4", "X14_5", "X14_6", "X14_7", "X14_8"))
-q14_Vertrauen <-  q14_Vertrauen %>% rename(Vergleichsdienste = X14_1, Blogs = X14_2, Influencer = X14_3, Freunde = X14_4, Mitarbeiter = X14_5, Webseite = X14_6, SocialMedia = X14_7, Email = X14_8)
+q14_Vertrauen <-  q14_Vertrauen %>% rename(Vergleichsdienste = X14_1, Blogs = X14_2, InfluencerIn = X14_3, Freunde = X14_4, Arbeitnehmende = X14_5, Webseite = X14_6, SocialMedia = X14_7, Email = X14_8)
 
-columnNames1 <- c("Vergleichsdienste", "Blogs", "Influencer", "Freunde", "Mitarbeiter", "Webseite", "SocialMedia", "Email")
+columnNames1 <- c("Vergleichsdienste", "Blogs", "InfluencerIn", "Freunde", "Arbeitnehmende", "Webseite", "SocialMedia", "Email")
 
 # levels2 = c("nicht vertrauenswürdig", "wenig vertrauenswürdig", "mittelmässig vertrauenswürdig","ziemlich vertrauenswürdig","sehr vertrauenswürdig")
 
@@ -2892,7 +2892,7 @@ levels2Angabe = c("nicht.(1)", "wenig(2)", "mittelmässig(3)","ziemlich(4)","seh
 levels2 = c("nicht.", "wenig", "mittelmässig","ziemlich","sehr")
 levels = addNA(levels2)
 
-q14_VertrauenAngepasst <- q14_Vertrauen %>% subset(select =              c(Nummer,Vergleichsdienste, Blogs, Influencer, Freunde, Mitarbeiter, Webseite, SocialMedia, Email)) %>% 
+q14_VertrauenAngepasst <- q14_Vertrauen %>% subset(select =              c(Nummer,Vergleichsdienste, Blogs, InfluencerIn, Freunde, Arbeitnehmende, Webseite, SocialMedia, Email)) %>% 
   mutate(
     Vergleichsdienste = case_when(
       Vergleichsdienste == 1 ~ levels[1], 
@@ -2908,12 +2908,12 @@ q14_VertrauenAngepasst <- q14_Vertrauen %>% subset(select =              c(Numme
       Blogs == 4 ~ levels[4],
       Blogs == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
-    Influencer = case_when(
-      Influencer == 1 ~ levels[1], 
-      Influencer == 2 ~ levels[2], 
-      Influencer == 3 ~ levels[3],
-      Influencer == 4 ~ levels[4],
-      Influencer == 5 ~ levels[5],
+    InfluencerIn = case_when(
+      InfluencerIn == 1 ~ levels[1], 
+      InfluencerIn == 2 ~ levels[2], 
+      InfluencerIn == 3 ~ levels[3],
+      InfluencerIn == 4 ~ levels[4],
+      InfluencerIn == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
     Freunde = case_when(
       Freunde == 1 ~ levels[1], 
@@ -2922,12 +2922,12 @@ q14_VertrauenAngepasst <- q14_Vertrauen %>% subset(select =              c(Numme
       Freunde == 4 ~ levels[4],
       Freunde == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
-    Mitarbeiter = case_when(
-      Mitarbeiter == 1 ~ levels[1], 
-      Mitarbeiter == 2 ~ levels[2], 
-      Mitarbeiter == 3 ~ levels[3],
-      Mitarbeiter == 4 ~ levels[4],
-      Mitarbeiter == 5 ~ levels[5],
+    Arbeitnehmende = case_when(
+      Arbeitnehmende == 1 ~ levels[1], 
+      Arbeitnehmende == 2 ~ levels[2], 
+      Arbeitnehmende == 3 ~ levels[3],
+      Arbeitnehmende == 4 ~ levels[4],
+      Arbeitnehmende == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
         Webseite = case_when(
       Webseite == 1 ~ levels[1], 
@@ -2951,7 +2951,7 @@ q14_VertrauenAngepasst <- q14_Vertrauen %>% subset(select =              c(Numme
       SocialMedia == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels))
 
-q14_VertrauenAngepasst <- q14_VertrauenAngepasst %>% gather(Vergleichsdienste, Blogs, Influencer, Freunde, Mitarbeiter, Webseite, SocialMedia, Email, key = Quelle, value = Frequenz)
+q14_VertrauenAngepasst <- q14_VertrauenAngepasst %>% gather(Vergleichsdienste, Blogs, InfluencerIn, Freunde, Arbeitnehmende, Webseite, SocialMedia, Email, key = Quelle, value = Frequenz)
 
 q14_VertrauenAngepasst <- q14_VertrauenAngepasst %>% filter(!is.na(Frequenz))
 
@@ -3400,14 +3400,14 @@ knitr::kable(
 
 q18_QuellenSuche <- subset(dat, select=c("Nummer", "X18_1", "X18_2", "X18_3", "X18_4","X18_5", "X18_6","X18_7", "X18_8","X18_9", "X18_10", "X18_11","X18b"))
 q18_QuellenSuche <- q18_QuellenSuche  %>% rename(Suchmaschine = X18_1, Vergleichsdienst = X18_2,
-                                                 Blogs = X18_3, Influencer = X18_4,
+                                                 Blogs = X18_3, InfluencerIn = X18_4,
                                                  Facebook = X18_5, Instagram = X18_6,
                                                  YouTube = X18_7, Twitter = X18_8,
                                                  Linkedin = X18_9, TikTok = X18_10,
                                                  Andere = X18_11, AndereText = X18b )
 
-columnNames1 <- c("Suchmaschine", "Vergleichsdienst", "Blogs", "Influencer", "Facebook", "Instagram", "YouTube", "Twitter", "Linkedin", "TikTok", "Andere")
-columnNamesNumber1 <- c("Nummer","Suchmaschine", "Vergleichsdienst", "Blogs", "Influencer", "Facebook", "Instagram", "YouTube", "Twitter", "Linkedin", "TikTok", "Andere")
+columnNames1 <- c("Suchmaschine", "Vergleichsdienst", "Blogs", "InfluencerIn", "Facebook", "Instagram", "YouTube", "Twitter", "Linkedin", "TikTok", "Andere")
+columnNamesNumber1 <- c("Nummer","Suchmaschine", "Vergleichsdienst", "Blogs", "InfluencerIn", "Facebook", "Instagram", "YouTube", "Twitter", "Linkedin", "TikTok", "Andere")
 
 levels2Angabe = c("nie(1)", "selten(2)", "gelegentlich(3)","oft(4)","immer(5)")
 levels2 = c("nie", "selten", "gelegentlich","oft","immer")
@@ -3470,12 +3470,12 @@ q18_QuellenSucheAngepasst <- q18_QuellenSuche %>% subset(select = columnNamesNum
       Blogs == 4 ~ levels[4],
       Blogs == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
-    Influencer = case_when(
-      Influencer == 1 ~ levels[1], 
-      Influencer == 2 ~ levels[2], 
-      Influencer == 3 ~ levels[3],
-      Influencer == 4 ~ levels[4],
-      Influencer == 5 ~ levels[5],
+    InfluencerIn = case_when(
+      InfluencerIn == 1 ~ levels[1], 
+      InfluencerIn == 2 ~ levels[2], 
+      InfluencerIn == 3 ~ levels[3],
+      InfluencerIn == 4 ~ levels[4],
+      InfluencerIn == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels),
     Facebook = case_when(
       Facebook == 1 ~ levels[1], 
@@ -3492,7 +3492,7 @@ q18_QuellenSucheAngepasst <- q18_QuellenSuche %>% subset(select = columnNamesNum
       Instagram == 5 ~ levels[5],
       TRUE ~  levels[6]) %>% factor(levels))
 
-q18_QuellenSucheAngepasst <- q18_QuellenSucheAngepasst %>% gather(Suchmaschine, Vergleichsdienst, Blogs, Influencer, Facebook, Instagram, YouTube, Twitter, Linkedin, TikTok, Andere, key = Quelle, value = Frequenz)
+q18_QuellenSucheAngepasst <- q18_QuellenSucheAngepasst %>% gather(Suchmaschine, Vergleichsdienst, Blogs, InfluencerIn, Facebook, Instagram, YouTube, Twitter, Linkedin, TikTok, Andere, key = Quelle, value = Frequenz)
 
 q18_QuellenSucheAngepasst <- q18_QuellenSucheAngepasst %>% filter(!is.na(Frequenz))
 
@@ -3582,13 +3582,13 @@ knitr::kable(
 
 q19_QuellenKauf <- subset(dat, select=c("Nummer", "X19_1", "X19_2", "X19_3", "X19_4","X19_5", "X19_6","X19_7", "X19_8","X19_9", "X19_10"))
 q19_QuellenKauf <- q19_QuellenKauf  %>% rename(Suchmaschine = X19_1, Vergleichsdienst = X19_2,
-                                                 Blogs = X19_3, Influencer = X19_4,
+                                                 Blogs = X19_3, InfluencerIn = X19_4,
                                                  Facebook = X19_5, Instagram = X19_6,
                                                  YouTube = X19_7, Twitter = X19_8,
                                                  Linkedin = X19_9, TikTok = X19_10)
 
-columnNames1 <- c("Suchmaschine", "Vergleichsdienst", "Blogs", "Influencer", "Facebook", "Instagram", "YouTube", "Twitter", "Linkedin", "TikTok")
-columnNamesNumber1 <- c("Nummer","Suchmaschine", "Vergleichsdienst", "Blogs", "Influencer", "Facebook", "Instagram", "YouTube", "Twitter", "Linkedin", "TikTok")
+columnNames1 <- c("Suchmaschine", "Vergleichsdienst", "Blogs", "InfluencerIn", "Facebook", "Instagram", "YouTube", "Twitter", "Linkedin", "TikTok")
+columnNamesNumber1 <- c("Nummer","Suchmaschine", "Vergleichsdienst", "Blogs", "InfluencerIn", "Facebook", "Instagram", "YouTube", "Twitter", "Linkedin", "TikTok")
 
 
 levels2Angabe = c("Ja(1)", "Nein(2)")
@@ -3624,9 +3624,9 @@ q19_QuellenKaufAngepasst <- q19_QuellenKauf %>% subset(select = columnNamesNumbe
       Blogs == 1 ~ levels[1], 
       Blogs == 2 ~ levels[2], 
       TRUE ~  levels[2]) %>% factor(levels),
-    Influencer = case_when(
-      Influencer == 1 ~ levels[1], 
-      Influencer == 2 ~ levels[2], 
+    InfluencerIn = case_when(
+      InfluencerIn == 1 ~ levels[1], 
+      InfluencerIn == 2 ~ levels[2], 
       TRUE ~  levels[3]) %>% factor(levels),
     Facebook = case_when(
       Facebook == 1 ~ levels[1], 
@@ -3637,7 +3637,7 @@ q19_QuellenKaufAngepasst <- q19_QuellenKauf %>% subset(select = columnNamesNumbe
       Instagram == 2 ~ levels[2], 
       TRUE ~  levels[3]) %>% factor(levels))
 
-q19_QuellenKaufAngepasst <- q19_QuellenKaufAngepasst %>% gather(Suchmaschine, Vergleichsdienst, Blogs, Influencer, Facebook, Instagram, YouTube, Twitter, Linkedin, TikTok, key = Quelle, value = Frequenz)
+q19_QuellenKaufAngepasst <- q19_QuellenKaufAngepasst %>% gather(Suchmaschine, Vergleichsdienst, Blogs, InfluencerIn, Facebook, Instagram, YouTube, Twitter, Linkedin, TikTok, key = Quelle, value = Frequenz)
 
 q19_QuellenKaufAngepasst <- q19_QuellenKaufAngepasst %>% filter(!is.na(Frequenz))
 
